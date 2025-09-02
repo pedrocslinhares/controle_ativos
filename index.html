@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Coletas de Equipamentos</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Sistema para controle e gerenciamento de coletas de equipamentos">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Coletas">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Ícones -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Reset e Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        /* Tipografia */
+        h1 {
+            color: #1f2937;
+            font-size: 1.875rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        h2 {
+            color: #1f2937;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem;
+        }
+
+        h3 {
+            color: #374151;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Formulários */
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.625rem;
+            font-size: 1rem;
+            color: #1f2937;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Campo com input manual */
+        .campo-combo {
+            position: relative;
+        }
+
+        .input-manual {
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .input-manual.visivel {
+            display: block;
+        }
+
+        .input-manual input {
+            border-color: #6366f1;
+        }
+
+        .label-manual {
+            font-size: 0.75rem;
+            color: #6366f1;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Autocomplete */
+        .autocomplete-lista {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 0.625rem 0.625rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .autocomplete-lista.visivel {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f0f4ff;
+        }
+
+        .autocomplete-item.selecionado {
+            background-color: #e0e7ff;
+        }
+
+        .autocomplete-item .marca-badge {
+            display: inline-block;
+            padding: 0.125rem 0.375rem;
+            background-color: #6366f1;
+            color: white;
+            border-radius: 0.25rem;
+            font-size: 0.625rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Badge de frequência */
+        .freq-badge {
+            display: inline-block;
+            padding: 0.125rem 0.375rem;
+            background-color: #10b981;
+            color: white;
+            border-radius: 0.25rem;
+            font-size: 0.625rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Botões */
+        button {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 0.625rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #6366f1, #4f46e5);
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: #ffffff;
+        }
+
+        .btn-danger {
+            background: linear-gradient(to right, #ef4444, #dc2626);
+            color: #ffffff;
+        }
+
+        .btn-success {
+            background: linear-gradient(to right, #34d399, #10b981);
+            color: #ffffff;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 0.875rem;
+            font-size: 0.8125rem;
+            min-width: fit-content;
+        }
+
+        /* Grid do Formulário */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        /* Menu Principal */
+        .menu-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* Lista de Coletas */
+        .lista-coletas {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .item-coleta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.625rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .item-coleta:hover {
+            background-color: #f0f4ff;
+            border-color: #c7d2fe;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .item-coleta-nome {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .item-coleta-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .item-coleta-contador {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 400;
+        }
+
+        .item-coleta-acoes {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            max-width: 60%;
+        }
+
+        /* Abas */
+        .abas {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .aba {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .aba.ativa {
+            color: #4f46e5;
+            border-color: #4f46e5;
+            font-weight: 700;
+        }
+
+        .aba:hover {
+            color: #4f46e5;
+        }
+
+        /* Badge de Contagem */
+        .badge-contador {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2rem;
+            height: 2rem;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            padding: 0 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #eef2ff;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        tr:hover {
+            background-color: #f0f4ff;
+        }
+
+        .tabela-container {
+            overflow-x: auto;
+        }
+
+        /* Mensagens */
+        .mensagem {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            text-align: center;
+            display: none;
+        }
+
+        .mensagem.sucesso {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+
+        .mensagem.erro {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .mensagem.visivel {
+            display: block;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.ativo {
+            display: flex;
+        }
+
+        .modal-conteudo {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-fechar {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .modal-fechar:hover {
+            color: #000;
+        }
+
+        .modal-botoes {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Status PWA */
+        .status-pwa {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 1001;
+            display: none;
+        }
+
+        .status-pwa.online {
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+        }
+
+        .status-pwa.offline {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        /* Prompt de Instalação */
+        .prompt-instalacao {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .prompt-instalacao.visivel {
+            display: flex;
+        }
+
+        /* CSV Output */
+        .csv-container {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+
+        .csv-textarea {
+            width: 100%;
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            font-family: monospace;
+        }
+
+        /* Utilitários */
+        .oculto {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .dica {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .item-coleta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+
+            .item-coleta-acoes {
+                width: 100%;
+                max-width: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+
+            .item-coleta-acoes button {
+                font-size: 0.75rem;
+                padding: 0.5rem 0.75rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Status de Conexão PWA -->
+    <div id="statusPWA" class="status-pwa">
+        <span id="textoStatus">Online</span>
+    </div>
+
+    <!-- Prompt de Instalação -->
+    <div id="promptInstalacao" class="prompt-instalacao">
+        <div>
+            <strong>📱 Instalar App</strong>
+            <div style="font-size: 0.875rem; margin-top: 0.25rem;">
+                Adicione à tela inicial para acesso rápido
+            </div>
+        </div>
+        <div>
+            <button id="btnInstalar" class="btn-secondary btn-sm">Instalar</button>
+            <button id="btnFecharPrompt" class="btn-secondary btn-sm">✕</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>📋 Controle de Coletas de Equipamentos</h1>
+
+        <!-- Tela Principal -->
+        <div id="telaPrincipal" class="tela">
+            <div class="menu-principal">
+                <button id="btnNovaColeta" class="btn-primary">
+                    ➕ Criar Nova Coleta
+                </button>
+                <button id="btnListarColetas" class="btn-secondary">
+                    📂 Acessar Coleta Existente
+                </button>
+            </div>
+        </div>
+
+        <!-- Tela de Lista de Coletas -->
+        <div id="telaListaColetas" class="tela oculto">
+            <h2>📋 Suas Coletas</h2>
+            <div id="listaColetas" class="lista-coletas"></div>
+            <div style="display: flex; justify-content: center; margin-top: 2rem;">
+                <button id="btnVoltarPrincipal" class="btn-secondary">
+                    ⬅️ Voltar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tela de Dados da Coleta -->
+        <div id="telaDadosColeta" class="tela oculto">
+            <h2 id="tituloColetaAtual"></h2>
+            
+            <div class="abas">
+                <button id="abaFormulario" class="aba ativa">
+                    📝 Registro
+                </button>
+                <button id="abaTabela" class="aba">
+                    📊 Itens Registrados
+                    <span id="contadorItens" class="badge-contador">0</span>
+                </button>
+            </div>
+
+            <div id="mensagem" class="mensagem"></div>
+
+            <!-- Conteúdo do Formulário -->
+            <div id="conteudoFormulario" class="conteudo-aba">
+                <h3>➕ Adicionar Novo Item</h3>
+                <form id="formularioCadastro" class="form-grid">
+                    <!-- Dados do Equipamento -->
+                    <div>
+                        <label for="tipo">TIPO:<span style="color: red;">*</span></label>
+                        <select id="tipo" required>
+                            <option value="">Selecione...</option>
+                            <option value="GABINETE">GABINETE</option>
+                            <option value="NOTEBOOK">NOTEBOOK</option>
+                            <option value="MONITOR">MONITOR</option>
+                            <option value="RAMAL">RAMAL</option>
+                        </select>
+                    </div>
+                    
+                    <div class="campo-combo">
+                        <label for="marca">MARCA:<span style="color: red;">*</span></label>
+                        <select id="marca" required>
+                            <option value="">Selecione o tipo primeiro...</option>
+                        </select>
+                        <div id="marcaManualContainer" class="input-manual">
+                            <label class="label-manual">Digite a marca:</label>
+                            <input type="text" id="marcaManual" placeholder="Ex: SAMSUNG">
+                        </div>
+                    </div>
+                    
+                    <div class="campo-combo">
+                        <label for="modelo">MODELO:</label>
+                        <select id="modelo">
+                            <option value="">Selecione a marca primeiro...</option>
+                        </select>
+                        <div id="modeloManualContainer" class="input-manual">
+                            <label class="label-manual">Digite o modelo:</label>
+                            <input type="text" id="modeloManual" placeholder="Ex: OPTIPLEX 790">
+                        </div>
+                        <div id="autocompleteModelo" class="autocomplete-lista"></div>
+                    </div>
+
+                    <!-- Patrimônio -->
+                    <div>
+                        <label for="numeroSerie">NÚMERO DE SÉRIE:</label>
+                        <input type="text" id="numeroSerie">
+                    </div>
+                    
+                    <div>
+                        <label for="patrimonioSiads">PAT. SIADS:</label>
+                        <input type="number" id="patrimonioSiads">
+                    </div>
+                    
+                    <div>
+                        <label for="patrimonioEbserh">PAT. EBSERH:</label>
+                        <input type="number" id="patrimonioEbserh">
+                    </div>
+                    
+                    <div>
+                        <label for="patrimonioFub">PAT. FUB:</label>
+                        <input type="text" id="patrimonioFub">
+                    </div>
+
+                    <!-- Localização -->
+                    <div>
+                        <label for="predio">PRÉDIO:<span style="color: red;">*</span></label>
+                        <select id="predio" required>
+                            <option value="">Selecione...</option>
+                            <option value="ADMINISTRAÇÃO">ADMINISTRAÇÃO</option>
+                            <option value="UNIDADE 1">UNIDADE 1</option>
+                            <option value="UNIDADE 2">UNIDADE 2</option>
+                            <option value="UCA">UCA</option>
+                            <option value="AMBULATÓRIO 1">AMBULATÓRIO 1</option>
+                            <option value="AMBULATÓRIO 2">AMBULATÓRIO 2</option>
+                            <option value="UNACON">UNACON</option>
+                            <option value="SIF">SIF</option>
+                            <option value="SEGURANÇA">SEGURANÇA</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="andar">ANDAR:<span style="color: red;">*</span></label>
+                        <select id="andar" required>
+                            <option value="">Selecione...</option>
+                            <option value="CPA">CPA</option>
+                            <option value="SUBSOLO">SUBSOLO</option>
+                            <option value="TÉRREO">TÉRREO</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    
+                    <div class="campo-combo">
+                        <label for="setor">SETOR:<span style="color: red;">*</span></label>
+                        <select id="setor" required>
+                            <option value="">Digite ou selecione...</option>
+                        </select>
+                        <div id="setorManualContainer" class="input-manual">
+                            <label class="label-manual">Digite o setor:</label>
+                            <input type="text" id="setorManual" placeholder="Ex: ALMOXARIFADO">
+                        </div>
+                    </div>
+
+                    <div class="campo-combo">
+                        <label for="local">LOCAL:<span style="color: red;">*</span></label>
+                        <select id="local" required>
+                            <option value="">Digite ou selecione...</option>
+                        </select>
+                        <div id="localManualContainer" class="input-manual">
+                            <label class="label-manual">Digite o local/sala:</label>
+                            <input type="text" id="localManual" placeholder="Ex: SALA 101">
+                        </div>
+                    </div>
+
+                    <!-- Detalhes -->
+                    <div>
+                        <label for="vinculo">VÍNCULO:</label>
+                        <input type="number" id="vinculo" placeholder="Nº patrimônio do computador">
+                        <div class="dica">
+                            💡 Para MONITOR/RAMAL: informe o PAT do computador vinculado
+                        </div>
+                    </div>
+                    
+                    <div class="full-width">
+                        <label for="observacao">OBSERVAÇÃO:</label>
+                        <textarea id="observacao" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="btnLimparForm" class="btn-secondary">
+                            🗑️ Limpar
+                        </button>
+                        <button type="submit" id="btnSalvarItem" class="btn-primary">
+                            ➕ Adicionar Item
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Conteúdo da Tabela -->
+            <div id="conteudoTabela" class="conteudo-aba oculto">
+                <h3>📊 Itens Registrados</h3>
+                <div class="tabela-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Nº de Série</th>
+                                <th>PAT. SIADS</th>
+                                <th>PAT. EBSERH</th>
+                                <th>PAT. FUB</th>
+                                <th>Prédio</th>
+                                <th>Andar</th>
+                                <th>Setor</th>
+                                <th>Local</th>
+                                <th>Vínculo</th>
+                                <th>Observação</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabela"></tbody>
+                    </table>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 2rem;">
+                    <button id="btnExportarCSV" class="btn-success">
+                        📤 Exportar para CSV
+                    </button>
+                    <button id="btnLimparTodos" class="btn-danger">
+                        🗑️ Limpar Todos os Itens
+                    </button>
+                </div>
+
+                <div id="containerCSV" class="csv-container oculto">
+                    <h3>📄 Dados CSV para Exportação:</h3>
+                    <textarea id="textoCSV" class="csv-textarea" rows="10" readonly></textarea>
+                    <p style="margin-top: 0.5rem; color: #6b7280; font-size: 0.875rem;">
+                        Copie o texto acima e cole em uma planilha ou arquivo .csv
+                    </p>
+                    <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.75rem;">
+                        <button id="btnCopiarCSV" class="btn-primary btn-sm">
+                            📋 Copiar
+                        </button>
+                        <button id="btnBaixarCSV" class="btn-secondary btn-sm">
+                            💾 Baixar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegação -->
+            <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 2rem;">
+                <button id="btnInicio" class="btn-secondary">
+                    🏠 INÍCIO
+                </button>
+                <button id="btnTodasColetas" class="btn-secondary">
+                    📂 TODAS COLETAS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Único -->
+    <div id="modal" class="modal">
+        <div class="modal-conteudo">
+            <span class="modal-fechar">&times;</span>
+            <h3 id="modalTitulo">Título</h3>
+            <input type="text" id="modalInput" placeholder="Digite aqui" style="display: none; margin: 1rem 0;">
+            <p id="modalMensagem" style="margin: 1rem 0;"></p>
+            <div class="modal-botoes">
+                <button id="modalBtnConfirmar" class="btn-primary">Confirmar</button>
+                <button id="modalBtnCancelar" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===========================================================================
+        // SISTEMA DE COLETAS COM RELAÇÕES INTELIGENTES E CAMPOS DINÂMICOS
+        // ===========================================================================
+
+        class SistemaColetas {
+            constructor() {
+                this.colecoes = {};
+                this.colecaoAtual = null;
+                this.dadosAtuais = [];
+                this.indiceEdicao = -1;
+                this.promptInstalacao = null;
+                
+                // Base de dados de marcas e modelos
+                this.baseDados = {
+                    MONITOR: {
+                        'ASUS': ['MV16AMT'],
+                        'ACER': ['X173W'],
+                        'DELL': ['E157FP', 'E1910', 'E1914HC', 'P2422HE', 'ST2420L', 'U2413'],
+                        'ITAUTEC': ['W1942PT'],
+                        'AOC': ['E2023PWD', 'e2243Fwk', '22P2ES', '22P2WG5', '24E3QF', '24P1U', '24P1W1', '717wx'],
+                        'POSITIVO': ['22MP55PJ-B', '24BL550J-B'],
+                        'LENOVO': ['LS1920wG', 'T23i-10'],
+                        'LG': ['22BN550Y-B'],
+                        'DATEN': ['DM238V', '20M35PD-M'],
+                        'HP': ['E190i', 'E201', 'E221', 'E243i', 'LA2006x', 'LA1905wg', 'V206hz', 'V223hz', 'V225hz', 'w17e', 'Z27q G3'],
+                        'SAMSUNG': ['S19B300', 'S20B300', 'S24D332']
+                    },
+                    GABINETE: {
+                        'HP': ['Compaq Pro 6305', 'Compaq 6005 Pro'],
+                        'ITAUTEC': ['SM3322'],
+                        'DATEN': ['DC1C-S', 'DC3D-U', 'DC6A-U', 'DC6E-S'],
+                        'LENOVO': ['P330'],
+                        'POSITIVO': ['C4400', 'C6200', 'C6400']
+                    },
+                    NOTEBOOK: {
+                        'DELL': [],
+                        'HP': [],
+                        'LENOVO': [],
+                        'ASUS': [],
+                        'ACER': [],
+                        'POSITIVO': [],
+                        'SAMSUNG': []
+                    },
+                    RAMAL: {}
+                };
+                
+                // Marcas, modelos, setores e locais personalizados
+                this.dadosPersonalizados = this.carregarDadosPersonalizados();
+                
+                // Histórico de setores e locais com frequência
+                this.historico = this.carregarHistorico();
+                
+                this.inicializar();
+            }
+
+            // Inicialização
+            inicializar() {
+                this.carregarDados();
+                this.configurarEventos();
+                this.configurarCamposDinamicos();
+                this.configurarCamposLocalizacao();
+                this.configurarPWA();
+                this.mostrarTela('telaPrincipal');
+            }
+
+            // Histórico e frequência
+            carregarHistorico() {
+                try {
+                    const hist = localStorage.getItem('locationHistory');
+                    return hist ? JSON.parse(hist) : { setores: {}, locais: {} };
+                } catch (e) {
+                    return { setores: {}, locais: {} };
+                }
+            }
+
+            salvarHistorico() {
+                localStorage.setItem('locationHistory', JSON.stringify(this.historico));
+            }
+
+            adicionarHistorico(tipo, valor) {
+                if (!valor) return;
+                
+                valor = valor.toUpperCase().trim();
+                
+                if (tipo === 'setor') {
+                    this.historico.setores[valor] = (this.historico.setores[valor] || 0) + 1;
+                } else if (tipo === 'local') {
+                    this.historico.locais[valor] = (this.historico.locais[valor] || 0) + 1;
+                }
+                
+                this.salvarHistorico();
+            }
+
+            obterSetoresOrdenados() {
+                return Object.entries(this.historico.setores)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([setor, freq]) => ({ valor: setor, frequencia: freq }));
+            }
+
+            obterLocaisOrdenados() {
+                return Object.entries(this.historico.locais)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([local, freq]) => ({ valor: local, frequencia: freq }));
+            }
+
+            // Dados Personalizados
+            carregarDadosPersonalizados() {
+                try {
+                    const dados = localStorage.getItem('equipmentCustomData');
+                    return dados ? JSON.parse(dados) : { MONITOR: {}, GABINETE: {}, NOTEBOOK: {}, RAMAL: {} };
+                } catch (e) {
+                    return { MONITOR: {}, GABINETE: {}, NOTEBOOK: {}, RAMAL: {} };
+                }
+            }
+
+            salvarDadosPersonalizados() {
+                localStorage.setItem('equipmentCustomData', JSON.stringify(this.dadosPersonalizados));
+            }
+
+            adicionarDadoPersonalizado(tipo, marca, modelo) {
+                if (!tipo || !marca) return;
+                
+                marca = marca.toUpperCase();
+                
+                if (!this.dadosPersonalizados[tipo]) {
+                    this.dadosPersonalizados[tipo] = {};
+                }
+                
+                if (!this.dadosPersonalizados[tipo][marca]) {
+                    this.dadosPersonalizados[tipo][marca] = [];
+                }
+                
+                if (modelo && !this.dadosPersonalizados[tipo][marca].includes(modelo)) {
+                    this.dadosPersonalizados[tipo][marca].push(modelo);
+                    this.salvarDadosPersonalizados();
+                }
+            }
+
+            obterMarcas(tipo) {
+                if (!tipo) return [];
+                
+                const marcasBase = Object.keys(this.baseDados[tipo] || {});
+                const marcasPersonalizadas = Object.keys(this.dadosPersonalizados[tipo] || {});
+                const todasMarcas = [...new Set([...marcasBase, ...marcasPersonalizadas])];
+                
+                return todasMarcas.sort();
+            }
+
+            obterModelos(tipo, marca) {
+                if (!tipo || !marca) return [];
+                
+                marca = marca.toUpperCase();
+                const modelosBase = this.baseDados[tipo]?.[marca] || [];
+                const modelosPersonalizados = this.dadosPersonalizados[tipo]?.[marca] || [];
+                const todosModelos = [...new Set([...modelosBase, ...modelosPersonalizados])];
+                
+                return todosModelos.sort();
+            }
+
+            // Campos de Localização Inteligentes
+            configurarCamposLocalizacao() {
+                const setorSelect = document.getElementById('setor');
+                const localSelect = document.getElementById('local');
+                const setorManual = document.getElementById('setorManual');
+                const localManual = document.getElementById('localManual');
+                const setorManualContainer = document.getElementById('setorManualContainer');
+                const localManualContainer = document.getElementById('localManualContainer');
+
+                // Preencher setores
+                this.atualizarListaSetores();
+                
+                // Preencher locais
+                this.atualizarListaLocais();
+
+                // Mudança de SETOR
+                setorSelect.addEventListener('change', () => {
+                    const setor = setorSelect.value;
+                    
+                    if (setor === 'OUTRO') {
+                        setorManualContainer.classList.add('visivel');
+                        setorSelect.removeAttribute('required');
+                        setorManual.setAttribute('required', '');
+                        setorManual.focus();
+                    } else {
+                        setorManualContainer.classList.remove('visivel');
+                        setorSelect.setAttribute('required', '');
+                        setorManual.removeAttribute('required');
+                        setorManual.value = '';
+                    }
+                });
+
+                // Mudança de LOCAL
+                localSelect.addEventListener('change', () => {
+                    const local = localSelect.value;
+                    
+                    if (local === 'OUTRO') {
+                        localManualContainer.classList.add('visivel');
+                        localSelect.removeAttribute('required');
+                        localManual.setAttribute('required', '');
+                        localManual.focus();
+                    } else {
+                        localManualContainer.classList.remove('visivel');
+                        localSelect.setAttribute('required', '');
+                        localManual.removeAttribute('required');
+                        localManual.value = '';
+                    }
+                });
+
+                // Converter para maiúsculas
+                setorManual.addEventListener('input', () => {
+                    setorManual.value = setorManual.value.toUpperCase();
+                });
+
+                localManual.addEventListener('input', () => {
+                    localManual.value = localManual.value.toUpperCase();
+                });
+            }
+
+            atualizarListaSetores() {
+                const setorSelect = document.getElementById('setor');
+                const setores = this.obterSetoresOrdenados();
+                
+                // Limpar opções existentes
+                setorSelect.innerHTML = '<option value="">Digite ou selecione...</option>';
+                
+                if (setores.length > 0) {
+                    // Adicionar setores mais usados
+                    const top5 = setores.slice(0, 5);
+                    top5.forEach(({ valor, frequencia }) => {
+                        const option = document.createElement('option');
+                        option.value = valor;
+                        option.innerHTML = `${valor} <span class="freq-badge">${frequencia}x</span>`;
+                        option.textContent = valor;
+                        setorSelect.appendChild(option);
+                    });
+                    
+                    // Se houver mais setores, adicionar separador e resto
+                    if (setores.length > 5) {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = '──────────';
+                        setorSelect.appendChild(optgroup);
+                        
+                        setores.slice(5).forEach(({ valor }) => {
+                            const option = document.createElement('option');
+                            option.value = valor;
+                            option.textContent = valor;
+                            setorSelect.appendChild(option);
+                        });
+                    }
+                }
+                
+                // Sempre adicionar opção "Outro..."
+                const optionOutro = document.createElement('option');
+                optionOutro.value = 'OUTRO';
+                optionOutro.textContent = '➕ Outro...';
+                optionOutro.style.fontWeight = 'bold';
+                optionOutro.style.color = '#6366f1';
+                setorSelect.appendChild(optionOutro);
+            }
+
+            atualizarListaLocais() {
+                const localSelect = document.getElementById('local');
+                const locais = this.obterLocaisOrdenados();
+                
+                // Limpar opções existentes
+                localSelect.innerHTML = '<option value="">Digite ou selecione...</option>';
+                
+                if (locais.length > 0) {
+                    // Adicionar locais mais usados
+                    const top5 = locais.slice(0, 5);
+                    top5.forEach(({ valor, frequencia }) => {
+                        const option = document.createElement('option');
+                        option.value = valor;
+                        option.innerHTML = `${valor} <span class="freq-badge">${frequencia}x</span>`;
+                        option.textContent = valor;
+                        localSelect.appendChild(option);
+                    });
+                    
+                    // Se houver mais locais, adicionar separador e resto
+                    if (locais.length > 5) {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = '──────────';
+                        localSelect.appendChild(optgroup);
+                        
+                        locais.slice(5).forEach(({ valor }) => {
+                            const option = document.createElement('option');
+                            option.value = valor;
+                            option.textContent = valor;
+                            localSelect.appendChild(option);
+                        });
+                    }
+                }
+                
+                // Sempre adicionar opção "Outro..."
+                const optionOutro = document.createElement('option');
+                optionOutro.value = 'OUTRO';
+                optionOutro.textContent = '➕ Outro...';
+                optionOutro.style.fontWeight = 'bold';
+                optionOutro.style.color = '#6366f1';
+                localSelect.appendChild(optionOutro);
+            }
+
+            // Campos Dinâmicos
+            configurarCamposDinamicos() {
+                const tipoSelect = document.getElementById('tipo');
+                const marcaSelect = document.getElementById('marca');
+                const modeloSelect = document.getElementById('modelo');
+                const marcaManual = document.getElementById('marcaManual');
+                const modeloManual = document.getElementById('modeloManual');
+                const marcaManualContainer = document.getElementById('marcaManualContainer');
+                const modeloManualContainer = document.getElementById('modeloManualContainer');
+
+                // Mudança de TIPO
+                tipoSelect.addEventListener('change', () => {
+                    const tipo = tipoSelect.value;
+                    
+                    // Resetar marca e modelo
+                    marcaSelect.innerHTML = '<option value="">Selecione...</option>';
+                    modeloSelect.innerHTML = '<option value="">Selecione a marca primeiro...</option>';
+                    marcaManualContainer.classList.remove('visivel');
+                    modeloManualContainer.classList.remove('visivel');
+                    marcaManual.value = '';
+                    modeloManual.value = '';
+                    
+                    if (tipo) {
+                        // Preencher marcas
+                        const marcas = this.obterMarcas(tipo);
+                        
+                        if (marcas.length > 0) {
+                            marcas.forEach(marca => {
+                                const option = document.createElement('option');
+                                option.value = marca;
+                                option.textContent = marca;
+                                marcaSelect.appendChild(option);
+                            });
+                            
+                            // Adicionar opção "Outro..."
+                            const optionOutro = document.createElement('option');
+                            optionOutro.value = 'OUTRO';
+                            optionOutro.textContent = '➕ Outro...';
+                            optionOutro.style.fontWeight = 'bold';
+                            optionOutro.style.color = '#6366f1';
+                            marcaSelect.appendChild(optionOutro);
+                        } else {
+                            // Se não há marcas predefinidas, mostrar input manual
+                            marcaManualContainer.classList.add('visivel');
+                            marcaSelect.removeAttribute('required');
+                            marcaManual.setAttribute('required', '');
+                        }
+                    }
+                });
+
+                // Mudança de MARCA
+                marcaSelect.addEventListener('change', () => {
+                    const tipo = tipoSelect.value;
+                    const marca = marcaSelect.value;
+                    
+                    // Resetar modelo
+                    modeloSelect.innerHTML = '<option value="">Selecione...</option>';
+                    modeloManualContainer.classList.remove('visivel');
+                    modeloManual.value = '';
+                    
+                    if (marca === 'OUTRO') {
+                        // Mostrar input manual para marca
+                        marcaManualContainer.classList.add('visivel');
+                        marcaSelect.removeAttribute('required');
+                        marcaManual.setAttribute('required', '');
+                        marcaManual.focus();
+                    } else {
+                        marcaManualContainer.classList.remove('visivel');
+                        marcaSelect.setAttribute('required', '');
+                        marcaManual.removeAttribute('required');
+                        
+                        if (tipo && marca) {
+                            // Preencher modelos
+                            const modelos = this.obterModelos(tipo, marca);
+                            
+                            if (modelos.length > 0) {
+                                modelos.forEach(modelo => {
+                                    const option = document.createElement('option');
+                                    option.value = modelo;
+                                    option.textContent = modelo;
+                                    modeloSelect.appendChild(option);
+                                });
+                            }
+                            
+                            // Sempre adicionar opção "Outro..."
+                            const optionOutro = document.createElement('option');
+                            optionOutro.value = 'OUTRO';
+                            optionOutro.textContent = '➕ Outro...';
+                            optionOutro.style.fontWeight = 'bold';
+                            optionOutro.style.color = '#6366f1';
+                            modeloSelect.appendChild(optionOutro);
+                        }
+                    }
+                });
+
+                // Mudança de MODELO
+                modeloSelect.addEventListener('change', () => {
+                    const modelo = modeloSelect.value;
+                    
+                    if (modelo === 'OUTRO') {
+                        modeloManualContainer.classList.add('visivel');
+                        modeloManual.focus();
+                    } else {
+                        modeloManualContainer.classList.remove('visivel');
+                        modeloManual.value = '';
+                    }
+                });
+
+                // Validação de entrada manual
+                marcaManual.addEventListener('input', () => {
+                    marcaManual.value = marcaManual.value.toUpperCase();
+                });
+            }
+
+            // PWA
+            configurarPWA() {
+                // Service Worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(() => console.log('Service Worker registrado'))
+                        .catch(err => console.log('Erro no SW:', err));
+                }
+
+                // Prompt de instalação
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.promptInstalacao = e;
+                    document.getElementById('promptInstalacao').classList.add('visivel');
+                });
+
+                // Status de conexão
+                const atualizarStatus = () => {
+                    const statusEl = document.getElementById('statusPWA');
+                    const textoEl = document.getElementById('textoStatus');
+                    
+                    if (navigator.onLine) {
+                        textoEl.textContent = '🟢 Online';
+                        statusEl.className = 'status-pwa online';
+                    } else {
+                        textoEl.textContent = '🔴 Offline';
+                        statusEl.className = 'status-pwa offline';
+                    }
+                    
+                    statusEl.style.display = 'block';
+                    setTimeout(() => statusEl.style.display = 'none', 3000);
+                };
+
+                window.addEventListener('online', atualizarStatus);
+                window.addEventListener('offline', atualizarStatus);
+            }
+
+            // Armazenamento
+            carregarDados() {
+                try {
+                    const dados = localStorage.getItem('allEquipmentCollections');
+                    if (dados) {
+                        const parsed = JSON.parse(dados);
+                        // Migração de dados antigos
+                        for (let colecao in parsed) {
+                            if (Array.isArray(parsed[colecao])) {
+                                parsed[colecao] = parsed[colecao].map(item => {
+                                    // Migrar MINIPC para GABINETE
+                                    if (item.type === 'MINIPC') {
+                                        item.type = 'GABINETE';
+                                    }
+                                    // Migrar campo sector antigo para setor e local
+                                    if (item.sector && !item.setor && !item.local) {
+                                        // Tentar dividir por hífen, barra ou vírgula
+                                        const partes = item.sector.split(/[-/,]/);
+                                        if (partes.length > 1) {
+                                            item.setor = partes[0].trim();
+                                            item.local = partes[1].trim();
+                                        } else {
+                                            item.setor = item.sector;
+                                            item.local = item.sector;
+                                        }
+                                    }
+                                    return item;
+                                });
+                            }
+                        }
+                        this.colecoes = parsed;
+                    }
+                } catch (erro) {
+                    console.error('Erro ao carregar dados:', erro);
+                    this.colecoes = {};
+                }
+            }
+
+            salvarDados() {
+                try {
+                    localStorage.setItem('allEquipmentCollections', JSON.stringify(this.colecoes));
+                } catch (erro) {
+                    console.error('Erro ao salvar:', erro);
+                    this.mostrarMensagem('Erro ao salvar dados', 'erro');
+                }
+            }
+
+            // Navegação
+            mostrarTela(idTela) {
+                document.querySelectorAll('.tela').forEach(tela => {
+                    tela.classList.add('oculto');
+                });
+                document.getElementById(idTela).classList.remove('oculto');
+                
+                if (idTela === 'telaDadosColeta') {
+                    this.mostrarAba('formulario');
+                }
+            }
+
+            mostrarAba(aba) {
+                const abaForm = document.getElementById('abaFormulario');
+                const abaTab = document.getElementById('abaTabela');
+                const conteudoForm = document.getElementById('conteudoFormulario');
+                const conteudoTab = document.getElementById('conteudoTabela');
+                
+                if (aba === 'formulario') {
+                    abaForm.classList.add('ativa');
+                    abaTab.classList.remove('ativa');
+                    conteudoForm.classList.remove('oculto');
+                    conteudoTab.classList.add('oculto');
+                } else {
+                    abaForm.classList.remove('ativa');
+                    abaTab.classList.add('ativa');
+                    conteudoForm.classList.add('oculto');
+                    conteudoTab.classList.remove('oculto');
+                    this.renderizarTabela();
+                }
+            }
+
+            // Mensagens
+            mostrarMensagem(texto, tipo = 'sucesso') {
+                const mensagem = document.getElementById('mensagem');
+                mensagem.textContent = texto;
+                mensagem.className = `mensagem ${tipo} visivel`;
+                setTimeout(() => mensagem.classList.remove('visivel'), 3000);
+            }
+
+            // Coleções
+            async criarColecao() {
+                const nome = await this.abrirModalInput('Nova Coleta', 'Nome da coleta:');
+                if (!nome) return;
+                
+                if (this.colecoes[nome]) {
+                    this.mostrarMensagem('Já existe uma coleta com este nome', 'erro');
+                    return;
+                }
+                
+                this.colecoes[nome] = [];
+                this.salvarDados();
+                this.abrirColecao(nome);
+                this.mostrarMensagem(`Coleta "${nome}" criada com sucesso!`);
+            }
+
+            abrirColecao(nome) {
+                this.colecaoAtual = nome;
+                this.dadosAtuais = this.colecoes[nome] || [];
+                document.getElementById('tituloColetaAtual').textContent = `Coleta: ${nome}`;
+                document.getElementById('contadorItens').textContent = this.dadosAtuais.length;
+                this.mostrarTela('telaDadosColeta');
+                // Atualizar listas de setor e local ao abrir coleta
+                this.atualizarListaSetores();
+                this.atualizarListaLocais();
+            }
+
+            async excluirColecao(nome) {
+                const confirmar = await this.abrirModalConfirmacao(
+                    'Excluir Coleta',
+                    `Deseja realmente excluir a coleta "${nome}"?`
+                );
+                
+                if (confirmar) {
+                    delete this.colecoes[nome];
+                    this.salvarDados();
+                    this.renderizarListaColecoes();
+                    this.mostrarMensagem(`Coleta "${nome}" excluída`);
+                }
+            }
+
+            renderizarListaColecoes() {
+                const lista = document.getElementById('listaColetas');
+                lista.innerHTML = '';
+                
+                const nomes = Object.keys(this.colecoes);
+                if (nomes.length === 0) {
+                    lista.innerHTML = '<p class="text-center">Nenhuma coleta criada ainda.</p>';
+                    return;
+                }
+                
+                nomes.forEach(nome => {
+                    const qtdItens = this.colecoes[nome].length;
+                    const item = document.createElement('div');
+                    item.className = 'item-coleta';
+                    item.innerHTML = `
+                        <div class="item-coleta-info">
+                            <span class="item-coleta-nome">${this.escaparHTML(nome)}</span>
+                            <span class="item-coleta-contador">
+                                ${qtdItens} ${qtdItens === 1 ? 'item' : 'itens'}
+                            </span>
+                        </div>
+                        <div class="item-coleta-acoes">
+                            <button onclick="sistema.abrirColecao('${this.escaparHTML(nome)}')" class="btn-primary btn-sm" title="Acessar coleta">
+                                📂 Acessar
+                            </button>
+                            <button onclick="sistema.exportarDiretoCSV('${this.escaparHTML(nome)}')" class="btn-success btn-sm" title="Baixar arquivo CSV">
+                                💾 Exportar
+                            </button>
+                            <button onclick="sistema.visualizarColecao('${this.escaparHTML(nome)}')" class="btn-secondary btn-sm" title="Ver resumo da coleta">
+                                👁️ Ver
+                            </button>
+                            <button onclick="sistema.excluirColecao('${this.escaparHTML(nome)}')" class="btn-danger btn-sm" title="Excluir coleta">
+                                🗑️
+                            </button>
+                        </div>
+                    `;
+                    lista.appendChild(item);
+                });
+            }
+
+            // Itens
+            salvarItem(evento) {
+                evento.preventDefault();
+                
+                const tipoSelect = document.getElementById('tipo');
+                const marcaSelect = document.getElementById('marca');
+                const modeloSelect = document.getElementById('modelo');
+                const marcaManual = document.getElementById('marcaManual');
+                const modeloManual = document.getElementById('modeloManual');
+                const setorSelect = document.getElementById('setor');
+                const localSelect = document.getElementById('local');
+                const setorManual = document.getElementById('setorManual');
+                const localManual = document.getElementById('localManual');
+                
+                // Determinar valores finais
+                let marca = marcaSelect.value === 'OUTRO' || !marcaSelect.value ? 
+                           marcaManual.value.trim() : marcaSelect.value.trim();
+                           
+                let modelo = modeloSelect.value === 'OUTRO' ? 
+                            modeloManual.value.trim() : 
+                            (modeloManual.value.trim() || modeloSelect.value.trim());
+                
+                let setor = setorSelect.value === 'OUTRO' || !setorSelect.value ?
+                           setorManual.value.trim() : setorSelect.value.trim();
+                           
+                let local = localSelect.value === 'OUTRO' || !localSelect.value ?
+                           localManual.value.trim() : localSelect.value.trim();
+                
+                const item = {
+                    type: tipoSelect.value.trim(),
+                    brand: marca,
+                    model: modelo,
+                    serialNumber: document.getElementById('numeroSerie').value.trim(),
+                    patSiads: document.getElementById('patrimonioSiads').value.trim(),
+                    patEbserh: document.getElementById('patrimonioEbserh').value.trim(),
+                    patFub: document.getElementById('patrimonioFub').value.trim(),
+                    building: document.getElementById('predio').value.trim(),
+                    floor: document.getElementById('andar').value.trim(),
+                    setor: setor.toUpperCase(),
+                    local: local.toUpperCase(),
+                    sector: `${setor.toUpperCase()} - ${local.toUpperCase()}`, // Manter compatibilidade
+                    vinculo: document.getElementById('vinculo').value.trim(),
+                    observation: document.getElementById('observacao').value.trim()
+                };
+
+                // Validações
+                if (!item.type || !item.brand || !item.building || !item.floor || !item.setor || !item.local) {
+                    this.mostrarMensagem('Preencha todos os campos obrigatórios', 'erro');
+                    return;
+                }
+
+                const patrimonios = [item.serialNumber, item.patSiads, item.patEbserh, item.patFub];
+                if (!patrimonios.some(p => p !== '')) {
+                    this.mostrarMensagem('Informe pelo menos um número de patrimônio', 'erro');
+                    return;
+                }
+
+                // Adicionar dados personalizados e histórico
+                if (marca && marca !== 'OUTRO') {
+                    this.adicionarDadoPersonalizado(item.type, marca, modelo);
+                }
+                
+                // Adicionar ao histórico de setores e locais
+                this.adicionarHistorico('setor', item.setor);
+                this.adicionarHistorico('local', item.local);
+
+                // Salvar
+                if (this.indiceEdicao === -1) {
+                    this.dadosAtuais.push(item);
+                    this.mostrarMensagem('Item adicionado com sucesso!');
+                } else {
+                    this.dadosAtuais[this.indiceEdicao] = item;
+                    this.mostrarMensagem('Item atualizado com sucesso!');
+                    this.indiceEdicao = -1;
+                    document.getElementById('btnSalvarItem').innerHTML = '➕ Adicionar Item';
+                }
+
+                this.colecoes[this.colecaoAtual] = this.dadosAtuais;
+                this.salvarDados();
+                
+                // Atualizar listas de setor e local
+                this.atualizarListaSetores();
+                this.atualizarListaLocais();
+                
+                document.getElementById('formularioCadastro').reset();
+                document.getElementById('contadorItens').textContent = this.dadosAtuais.length;
+                
+                // Limpar campos dinâmicos
+                document.getElementById('marcaManualContainer').classList.remove('visivel');
+                document.getElementById('modeloManualContainer').classList.remove('visivel');
+                document.getElementById('setorManualContainer').classList.remove('visivel');
+                document.getElementById('localManualContainer').classList.remove('visivel');
+                document.getElementById('marca').setAttribute('required', '');
+                document.getElementById('marcaManual').removeAttribute('required');
+                document.getElementById('setor').setAttribute('required', '');
+                document.getElementById('setorManual').removeAttribute('required');
+                document.getElementById('local').setAttribute('required', '');
+                document.getElementById('localManual').removeAttribute('required');
+            }
+
+            editarItem(indice) {
+                const item = this.dadosAtuais[indice];
+                
+                // Preencher tipo primeiro
+                document.getElementById('tipo').value = item.type || '';
+                
+                // Disparar evento de mudança para atualizar marcas
+                document.getElementById('tipo').dispatchEvent(new Event('change'));
+                
+                // Aguardar um momento para o DOM atualizar
+                setTimeout(() => {
+                    const marcaSelect = document.getElementById('marca');
+                    const modeloSelect = document.getElementById('modelo');
+                    
+                    // Verificar se a marca existe nas opções
+                    const marcaExiste = Array.from(marcaSelect.options).some(opt => opt.value === item.brand);
+                    
+                    if (marcaExiste) {
+                        marcaSelect.value = item.brand;
+                    } else if (item.brand) {
+                        // Marca personalizada
+                        marcaSelect.value = 'OUTRO';
+                        document.getElementById('marcaManualContainer').classList.add('visivel');
+                        document.getElementById('marcaManual').value = item.brand;
+                    }
+                    
+                    // Disparar evento de mudança para atualizar modelos
+                    marcaSelect.dispatchEvent(new Event('change'));
+                    
+                    setTimeout(() => {
+                        // Verificar se o modelo existe nas opções
+                        const modeloExiste = Array.from(modeloSelect.options).some(opt => opt.value === item.model);
+                        
+                        if (modeloExiste) {
+                            modeloSelect.value = item.model;
+                        } else if (item.model) {
+                            // Modelo personalizado
+                            modeloSelect.value = 'OUTRO';
+                            document.getElementById('modeloManualContainer').classList.add('visivel');
+                            document.getElementById('modeloManual').value = item.model;
+                        }
+                    }, 50);
+                }, 50);
+                
+                // Preencher outros campos
+                document.getElementById('numeroSerie').value = item.serialNumber || '';
+                document.getElementById('patrimonioSiads').value = item.patSiads || '';
+                document.getElementById('patrimonioEbserh').value = item.patEbserh || '';
+                document.getElementById('patrimonioFub').value = item.patFub || '';
+                document.getElementById('predio').value = item.building || '';
+                document.getElementById('andar').value = item.floor || '';
+                
+                // Preencher setor
+                const setorSelect = document.getElementById('setor');
+                const setorExiste = Array.from(setorSelect.options).some(opt => opt.value === item.setor);
+                
+                if (setorExiste) {
+                    setorSelect.value = item.setor || '';
+                } else if (item.setor) {
+                    setorSelect.value = 'OUTRO';
+                    document.getElementById('setorManualContainer').classList.add('visivel');
+                    document.getElementById('setorManual').value = item.setor || '';
+                }
+                
+                // Preencher local
+                const localSelect = document.getElementById('local');
+                const localExiste = Array.from(localSelect.options).some(opt => opt.value === item.local);
+                
+                if (localExiste) {
+                    localSelect.value = item.local || '';
+                } else if (item.local) {
+                    localSelect.value = 'OUTRO';
+                    document.getElementById('localManualContainer').classList.add('visivel');
+                    document.getElementById('localManual').value = item.local || '';
+                }
+                
+                document.getElementById('vinculo').value = item.vinculo || '';
+                document.getElementById('observacao').value = item.observation || '';
+                
+                this.indiceEdicao = indice;
+                document.getElementById('btnSalvarItem').innerHTML = '✏️ Atualizar Item';
+                this.mostrarAba('formulario');
+                this.mostrarMensagem('Editando item...');
+            }
+
+            async excluirItem(indice) {
+                const confirmar = await this.abrirModalConfirmacao(
+                    'Excluir Item',
+                    'Deseja realmente excluir este item?'
+                );
+                
+                if (confirmar) {
+                    this.dadosAtuais.splice(indice, 1);
+                    this.colecoes[this.colecaoAtual] = this.dadosAtuais;
+                    this.salvarDados();
+                    this.renderizarTabela();
+                    document.getElementById('contadorItens').textContent = this.dadosAtuais.length;
+                    this.mostrarMensagem('Item excluído');
+                }
+            }
+
+            async limparTodos() {
+                const confirmar = await this.abrirModalConfirmacao(
+                    'Limpar Todos',
+                    'ATENÇÃO: Isso apagará TODOS os itens desta coleta. Continuar?'
+                );
+                
+                if (confirmar) {
+                    this.dadosAtuais = [];
+                    this.colecoes[this.colecaoAtual] = this.dadosAtuais;
+                    this.salvarDados();
+                    this.renderizarTabela();
+                    document.getElementById('contadorItens').textContent = 0;
+                    this.mostrarMensagem('Todos os itens foram removidos', 'erro');
+                }
+            }
+
+            renderizarTabela() {
+                const corpo = document.getElementById('corpoTabela');
+                corpo.innerHTML = '';
+                
+                if (this.dadosAtuais.length === 0) {
+                    corpo.innerHTML = '<tr><td colspan="14" class="text-center">Nenhum item registrado</td></tr>';
+                    return;
+                }
+                
+                this.dadosAtuais.forEach((item, indice) => {
+                    const linha = corpo.insertRow();
+                    linha.innerHTML = `
+                        <td>${this.escaparHTML(item.type || '')}</td>
+                        <td>${this.escaparHTML(item.brand || '')}</td>
+                        <td>${this.escaparHTML(item.model || '')}</td>
+                        <td>${this.escaparHTML(item.serialNumber || '')}</td>
+                        <td>${this.escaparHTML(item.patSiads || '')}</td>
+                        <td>${this.escaparHTML(item.patEbserh || '')}</td>
+                        <td>${this.escaparHTML(item.patFub || '')}</td>
+                        <td>${this.escaparHTML(item.building || '')}</td>
+                        <td>${this.escaparHTML(item.floor || '')}</td>
+                        <td>${this.escaparHTML(item.setor || '')}</td>
+                        <td>${this.escaparHTML(item.local || '')}</td>
+                        <td>${this.escaparHTML(item.vinculo || '')}</td>
+                        <td>${this.escaparHTML(item.observation || '')}</td>
+                        <td class="text-center">
+                            <button onclick="sistema.editarItem(${indice})" class="btn-secondary btn-sm">Editar</button>
+                            <button onclick="sistema.excluirItem(${indice})" class="btn-danger btn-sm">Excluir</button>
+                        </td>
+                    `;
+                });
+            }
+
+            // Exportação
+            exportarColecao(nomeColecao) {
+                const dados = this.colecoes[nomeColecao || this.colecaoAtual] || [];
+                
+                if (dados.length === 0) {
+                    this.mostrarMensagem('Nenhum dado para exportar', 'erro');
+                    return;
+                }
+                
+                const cabecalhos = [
+                    "TIPO", "MARCA", "MODELO", "NÚMERO DE SÉRIE",
+                    "PAT. SIADS", "PAT. EBSERH", "PAT. FUB",
+                    "PRÉDIO", "ANDAR", "SETOR", "LOCAL", "VÍNCULO", "OBSERVAÇÃO"
+                ];
+                
+                let csv = '\uFEFF' + cabecalhos.join(';') + '\n';
+                
+                dados.forEach(item => {
+                    const linha = [
+                        item.type, item.brand, item.model, item.serialNumber,
+                        item.patSiads, item.patEbserh, item.patFub,
+                        item.building, item.floor, 
+                        item.setor || (item.sector ? item.sector.split('-')[0]?.trim() : ''),
+                        item.local || (item.sector ? item.sector.split('-')[1]?.trim() : ''),
+                        item.vinculo || item.user || '',
+                        item.observation
+                    ].map(v => this.escaparCSV(v)).join(';');
+                    csv += linha + '\n';
+                });
+                
+                document.getElementById('textoCSV').value = csv;
+                document.getElementById('containerCSV').classList.remove('oculto');
+                this.mostrarMensagem('Dados prontos para exportação');
+            }
+
+            // Exportação direta para download
+            exportarDiretoCSV(nomeColecao) {
+                const dados = this.colecoes[nomeColecao] || [];
+                
+                if (dados.length === 0) {
+                    this.mostrarMensagem('Esta coleta não possui itens para exportar', 'erro');
+                    return;
+                }
+                
+                const cabecalhos = [
+                    "TIPO", "MARCA", "MODELO", "NÚMERO DE SÉRIE",
+                    "PAT. SIADS", "PAT. EBSERH", "PAT. FUB",
+                    "PRÉDIO", "ANDAR", "SETOR", "LOCAL", "VÍNCULO", "OBSERVAÇÃO"
+                ];
+                
+                let csv = '\uFEFF' + cabecalhos.join(';') + '\n';
+                
+                dados.forEach(item => {
+                    const linha = [
+                        item.type, item.brand, item.model, item.serialNumber,
+                        item.patSiads, item.patEbserh, item.patFub,
+                        item.building, item.floor, 
+                        item.setor || (item.sector ? item.sector.split('-')[0]?.trim() : ''),
+                        item.local || (item.sector ? item.sector.split('-')[1]?.trim() : ''),
+                        item.vinculo || item.user || '',
+                        item.observation
+                    ].map(v => this.escaparCSV(v)).join(';');
+                    csv += linha + '\n';
+                });
+                
+                // Baixar direto
+                const nomeArquivo = `coleta_${nomeColecao}_${new Date().toISOString().split('T')[0]}.csv`;
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = nomeArquivo;
+                link.click();
+                
+                // Feedback visual com animação
+                this.mostrarMensagemTemporaria(`✅ CSV "${nomeColecao}" baixado com sucesso!`, 'sucesso');
+            }
+
+            // Visualização rápida da coleta
+            async visualizarColecao(nomeColecao) {
+                const dados = this.colecoes[nomeColecao] || [];
+                
+                if (dados.length === 0) {
+                    this.mostrarMensagem('Esta coleta não possui itens', 'erro');
+                    return;
+                }
+                
+                // Criar resumo da coleta
+                const resumo = {
+                    total: dados.length,
+                    porTipo: {},
+                    porPredio: {},
+                    porSetor: {}
+                };
+                
+                dados.forEach(item => {
+                    // Contar por tipo
+                    resumo.porTipo[item.type] = (resumo.porTipo[item.type] || 0) + 1;
+                    // Contar por prédio
+                    resumo.porPredio[item.building] = (resumo.porPredio[item.building] || 0) + 1;
+                    // Contar por setor
+                    const setor = item.setor || 'NÃO INFORMADO';
+                    resumo.porSetor[setor] = (resumo.porSetor[setor] || 0) + 1;
+                });
+                
+                // Montar mensagem do resumo
+                let mensagemResumo = `📊 RESUMO DA COLETA "${nomeColecao}"\n\n`;
+                mensagemResumo += `Total de itens: ${resumo.total}\n\n`;
+                
+                mensagemResumo += `Por Tipo:\n`;
+                Object.entries(resumo.porTipo).forEach(([tipo, qtd]) => {
+                    mensagemResumo += `  • ${tipo}: ${qtd}\n`;
+                });
+                
+                mensagemResumo += `\nPor Prédio:\n`;
+                Object.entries(resumo.porPredio).forEach(([predio, qtd]) => {
+                    mensagemResumo += `  • ${predio}: ${qtd}\n`;
+                });
+                
+                mensagemResumo += `\nPor Setor (Top 5):\n`;
+                Object.entries(resumo.porSetor)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5)
+                    .forEach(([setor, qtd]) => {
+                        mensagemResumo += `  • ${setor}: ${qtd}\n`;
+                    });
+                
+                // Usar o modal existente para mostrar o resumo
+                await this.abrirModalVisualizacao('Visualização da Coleta', mensagemResumo);
+            }
+
+            // Mensagem temporária com animação
+            mostrarMensagemTemporaria(texto, tipo = 'sucesso') {
+                // Criar elemento de mensagem flutuante
+                const msgElement = document.createElement('div');
+                msgElement.className = `mensagem ${tipo} visivel`;
+                msgElement.textContent = texto;
+                msgElement.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    animation: slideIn 0.3s ease-out;
+                `;
+                
+                // Adicionar animação CSS se não existir
+                if (!document.querySelector('#animacoes-custom')) {
+                    const style = document.createElement('style');
+                    style.id = 'animacoes-custom';
+                    style.textContent = `
+                        @keyframes slideIn {
+                            from {
+                                transform: translateX(100%);
+                                opacity: 0;
+                            }
+                            to {
+                                transform: translateX(0);
+                                opacity: 1;
+                            }
+                        }
+                        @keyframes slideOut {
+                            from {
+                                transform: translateX(0);
+                                opacity: 1;
+                            }
+                            to {
+                                transform: translateX(100%);
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                document.body.appendChild(msgElement);
+                
+                // Remover após 3 segundos com animação
+                setTimeout(() => {
+                    msgElement.style.animation = 'slideOut 0.3s ease-out';
+                    setTimeout(() => msgElement.remove(), 300);
+                }, 3000);
+            }
+
+            copiarCSV() {
+                const textarea = document.getElementById('textoCSV');
+                textarea.select();
+                document.execCommand('copy');
+                this.mostrarMensagem('CSV copiado!');
+            }
+
+            baixarCSV() {
+                const csv = document.getElementById('textoCSV').value;
+                const nome = `coleta_${this.colecaoAtual}_${new Date().toISOString().split('T')[0]}.csv`;
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = nome;
+                link.click();
+                this.mostrarMensagem('Arquivo baixado!');
+            }
+
+            // Utilitários
+            escaparHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            escaparCSV(valor) {
+                if (!valor) return '';
+                const str = String(valor);
+                if (str.includes(';') || str.includes('"') || str.includes('\n')) {
+                    return `"${str.replace(/"/g, '""')}"`;
+                }
+                return str;
+            }
+
+            // Modal
+            abrirModalInput(titulo, mensagem) {
+                return new Promise((resolver) => {
+                    const modal = document.getElementById('modal');
+                    document.getElementById('modalTitulo').textContent = titulo;
+                    document.getElementById('modalMensagem').textContent = mensagem;
+                    
+                    const input = document.getElementById('modalInput');
+                    input.style.display = 'block';
+                    input.value = '';
+                    
+                    modal.classList.add('ativo');
+                    
+                    const confirmar = () => {
+                        modal.classList.remove('ativo');
+                        resolver(input.value.trim());
+                    };
+                    
+                    const cancelar = () => {
+                        modal.classList.remove('ativo');
+                        resolver(null);
+                    };
+                    
+                    document.getElementById('modalBtnConfirmar').onclick = confirmar;
+                    document.getElementById('modalBtnCancelar').onclick = cancelar;
+                });
+            }
+
+            abrirModalConfirmacao(titulo, mensagem) {
+                return new Promise((resolver) => {
+                    const modal = document.getElementById('modal');
+                    document.getElementById('modalTitulo').textContent = titulo;
+                    document.getElementById('modalMensagem').textContent = mensagem;
+                    document.getElementById('modalInput').style.display = 'none';
+                    
+                    modal.classList.add('ativo');
+                    
+                    document.getElementById('modalBtnConfirmar').onclick = () => {
+                        modal.classList.remove('ativo');
+                        resolver(true);
+                    };
+                    
+                    document.getElementById('modalBtnCancelar').onclick = () => {
+                        modal.classList.remove('ativo');
+                        resolver(false);
+                    };
+                });
+            }
+
+            abrirModalVisualizacao(titulo, mensagem) {
+                return new Promise((resolver) => {
+                    const modal = document.getElementById('modal');
+                    document.getElementById('modalTitulo').textContent = titulo;
+                    const modalMsg = document.getElementById('modalMensagem');
+                    modalMsg.textContent = mensagem;
+                    modalMsg.style.whiteSpace = 'pre-line';
+                    modalMsg.style.textAlign = 'left';
+                    modalMsg.style.fontSize = '0.875rem';
+                    modalMsg.style.maxHeight = '400px';
+                    modalMsg.style.overflowY = 'auto';
+                    document.getElementById('modalInput').style.display = 'none';
+                    
+                    // Esconder botão cancelar e mudar texto do confirmar
+                    document.getElementById('modalBtnCancelar').style.display = 'none';
+                    document.getElementById('modalBtnConfirmar').textContent = 'Fechar';
+                    
+                    modal.classList.add('ativo');
+                    
+                    document.getElementById('modalBtnConfirmar').onclick = () => {
+                        modal.classList.remove('ativo');
+                        // Restaurar botões
+                        document.getElementById('modalBtnCancelar').style.display = '';
+                        document.getElementById('modalBtnConfirmar').textContent = 'Confirmar';
+                        modalMsg.style.whiteSpace = '';
+                        modalMsg.style.textAlign = '';
+                        modalMsg.style.fontSize = '';
+                        modalMsg.style.maxHeight = '';
+                        modalMsg.style.overflowY = '';
+                        resolver(true);
+                    };
+                });
+            }
+
+            // Eventos
+            configurarEventos() {
+                // Navegação
+                document.getElementById('btnNovaColeta').addEventListener('click', () => this.criarColecao());
+                document.getElementById('btnListarColetas').addEventListener('click', () => {
+                    this.renderizarListaColecoes();
+                    this.mostrarTela('telaListaColetas');
+                });
+                document.getElementById('btnVoltarPrincipal').addEventListener('click', () => this.mostrarTela('telaPrincipal'));
+                document.getElementById('btnInicio').addEventListener('click', () => this.mostrarTela('telaPrincipal'));
+                document.getElementById('btnTodasColetas').addEventListener('click', () => {
+                    this.renderizarListaColecoes();
+                    this.mostrarTela('telaListaColetas');
+                });
+
+                // Abas
+                document.getElementById('abaFormulario').addEventListener('click', () => this.mostrarAba('formulario'));
+                document.getElementById('abaTabela').addEventListener('click', () => this.mostrarAba('tabela'));
+
+                // Formulário
+                document.getElementById('formularioCadastro').addEventListener('submit', (e) => this.salvarItem(e));
+                document.getElementById('btnLimparForm').addEventListener('click', () => {
+                    document.getElementById('formularioCadastro').reset();
+                    document.getElementById('marcaManualContainer').classList.remove('visivel');
+                    document.getElementById('modeloManualContainer').classList.remove('visivel');
+                    document.getElementById('setorManualContainer').classList.remove('visivel');
+                    document.getElementById('localManualContainer').classList.remove('visivel');
+                    document.getElementById('marca').setAttribute('required', '');
+                    document.getElementById('marcaManual').removeAttribute('required');
+                    document.getElementById('setor').setAttribute('required', '');
+                    document.getElementById('setorManual').removeAttribute('required');
+                    document.getElementById('local').setAttribute('required', '');
+                    document.getElementById('localManual').removeAttribute('required');
+                    this.indiceEdicao = -1;
+                    document.getElementById('btnSalvarItem').innerHTML = '➕ Adicionar Item';
+                });
+
+                // Tabela
+                document.getElementById('btnExportarCSV').addEventListener('click', () => this.exportarColecao());
+                document.getElementById('btnLimparTodos').addEventListener('click', () => this.limparTodos());
+                document.getElementById('btnCopiarCSV').addEventListener('click', () => this.copiarCSV());
+                document.getElementById('btnBaixarCSV').addEventListener('click', () => this.baixarCSV());
+
+                // Modal
+                document.querySelector('.modal-fechar').addEventListener('click', () => {
+                    document.getElementById('modal').classList.remove('ativo');
+                });
+
+                // PWA
+                document.getElementById('btnInstalar').addEventListener('click', async () => {
+                    if (this.promptInstalacao) {
+                        this.promptInstalacao.prompt();
+                        const { outcome } = await this.promptInstalacao.userChoice;
+                        if (outcome === 'accepted') {
+                            document.getElementById('promptInstalacao').classList.remove('visivel');
+                        }
+                        this.promptInstalacao = null;
+                    }
+                });
+
+                document.getElementById('btnFecharPrompt').addEventListener('click', () => {
+                    document.getElementById('promptInstalacao').classList.remove('visivel');
+                });
+            }
+        }
+
+        // Inicialização Global
+        const sistema = new SistemaColetas();
+    </script>
+</body>
+</html>
