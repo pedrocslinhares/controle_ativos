@@ -717,6 +717,90 @@
             z-index: 9999;
             animation: slideIn 0.3s ease-out;
         }
+
+        /* Indicador de Storage */
+        .storage-indicator {
+            margin-top: 2.5rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+        }
+
+        .storage-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .storage-icon {
+            font-size: 1.25rem;
+        }
+
+        .storage-title {
+            font-weight: 600;
+            color: #374151;
+            flex: 1;
+        }
+
+        .storage-percent {
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            background-color: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .storage-bar-container {
+            width: 100%;
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .storage-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.5s ease, background-color 0.3s ease;
+            background: linear-gradient(to right, #22c55e, #16a34a);
+        }
+
+        .storage-bar.warning {
+            background: linear-gradient(to right, #f59e0b, #d97706);
+        }
+
+        .storage-bar.danger {
+            background: linear-gradient(to right, #ef4444, #dc2626);
+        }
+
+        .storage-info {
+            margin-top: 0.5rem;
+            font-size: 0.8125rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .storage-warning {
+            margin-top: 0.75rem;
+            padding: 0.625rem;
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 0.5rem;
+            color: #92400e;
+            font-size: 0.8125rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .storage-warning.critical {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
     </style>
 </head>
 <body>
@@ -747,6 +831,24 @@
                 Selecione o tipo de formulário para iniciar
             </p>
             <div id="hubGrid" class="hub-grid"></div>
+            
+            <!-- Indicador de Storage -->
+            <div id="storageIndicator" class="storage-indicator">
+                <div class="storage-header">
+                    <span class="storage-icon">💾</span>
+                    <span class="storage-title">Armazenamento Local</span>
+                    <span id="storagePercent" class="storage-percent">0%</span>
+                </div>
+                <div class="storage-bar-container">
+                    <div id="storageBar" class="storage-bar"></div>
+                </div>
+                <div class="storage-info">
+                    <span id="storageUsed">0 KB</span> de <span id="storageLimit">4 MB</span>
+                </div>
+                <div id="storageWarning" class="storage-warning oculto">
+                    ⚠️ Armazenamento quase cheio! Considere exportar e limpar coletas antigas.
+                </div>
+            </div>
         </div>
 
         <!-- TELA PRINCIPAL - Menu do Formulário Selecionado -->
@@ -1202,9 +1304,17 @@
             salvarDados() {
                 try {
                     localStorage.setItem('sistemaColecoesV2', JSON.stringify(this.colecoes));
+                    // Atualizar indicador se estiver visível
+                    if (!document.getElementById('telaHub').classList.contains('oculto')) {
+                        this.atualizarIndicadorStorage();
+                    }
                 } catch (erro) {
                     console.error('Erro ao salvar:', erro);
-                    this.mostrarMensagem('Erro ao salvar dados', 'erro');
+                    if (erro.name === 'QuotaExceededError') {
+                        this.mostrarMensagem('Armazenamento cheio! Exporte e limpe coletas antigas.', 'erro');
+                    } else {
+                        this.mostrarMensagem('Erro ao salvar dados', 'erro');
+                    }
                 }
             }
 
@@ -1232,6 +1342,7 @@
             irParaHub() {
                 this.tipoAtual = null;
                 this.colecaoAtual = null;
+                this.renderizarHub();
                 this.mostrarTela('telaHub');
             }
 
@@ -1312,6 +1423,9 @@
                     `;
                     grid.appendChild(card);
                 }
+                
+                // Atualizar indicador de storage
+                this.atualizarIndicadorStorage();
             }
 
             // ===========================================================================
@@ -2266,6 +2380,80 @@
                         resolver(true);
                     };
                 });
+            }
+
+            // ===========================================================================
+            // STORAGE - MONITORAMENTO
+            // ===========================================================================
+            
+            calcularUsoStorage() {
+                let bytes = 0;
+                
+                try {
+                    for (let key in localStorage) {
+                        if (localStorage.hasOwnProperty(key)) {
+                            // Cada caractere em JS = 2 bytes (UTF-16)
+                            bytes += (key.length + localStorage.getItem(key).length) * 2;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Erro ao calcular storage:', e);
+                }
+                
+                return bytes;
+            }
+
+            formatarBytes(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            atualizarIndicadorStorage() {
+                const LIMITE_BYTES = 4 * 1024 * 1024; // 4MB seguro
+                const usoBytes = this.calcularUsoStorage();
+                const percentual = Math.min((usoBytes / LIMITE_BYTES) * 100, 100);
+                
+                // Atualizar elementos
+                const barEl = document.getElementById('storageBar');
+                const percentEl = document.getElementById('storagePercent');
+                const usedEl = document.getElementById('storageUsed');
+                const warningEl = document.getElementById('storageWarning');
+                
+                if (!barEl || !percentEl || !usedEl || !warningEl) return;
+                
+                // Atualizar valores
+                barEl.style.width = percentual + '%';
+                percentEl.textContent = percentual.toFixed(1) + '%';
+                usedEl.textContent = this.formatarBytes(usoBytes);
+                
+                // Remover classes anteriores
+                barEl.classList.remove('warning', 'danger');
+                warningEl.classList.remove('critical');
+                warningEl.classList.add('oculto');
+                
+                // Aplicar cores baseado no uso
+                if (percentual >= 90) {
+                    barEl.classList.add('danger');
+                    percentEl.style.backgroundColor = '#fee2e2';
+                    percentEl.style.color = '#dc2626';
+                    warningEl.classList.remove('oculto');
+                    warningEl.classList.add('critical');
+                    warningEl.textContent = '🚨 Armazenamento crítico! Exporte e limpe coletas antigas urgentemente.';
+                } else if (percentual >= 70) {
+                    barEl.classList.add('warning');
+                    percentEl.style.backgroundColor = '#fef3c7';
+                    percentEl.style.color = '#d97706';
+                    warningEl.classList.remove('oculto');
+                    warningEl.textContent = '⚠️ Armazenamento quase cheio! Considere exportar e limpar coletas antigas.';
+                } else {
+                    percentEl.style.backgroundColor = '#d1fae5';
+                    percentEl.style.color = '#059669';
+                }
             }
 
             // ===========================================================================
