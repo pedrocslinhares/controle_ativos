@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Coletas de Equipamentos</title>
+    <title>Sistema de Coletas</title>
     
     <!-- PWA Meta Tags -->
-    <meta name="description" content="Sistema para controle e gerenciamento de coletas de equipamentos">
+    <meta name="description" content="Sistema para controle e gerenciamento de coletas com múltiplos formulários">
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -42,7 +42,7 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             background-color: #ffffff;
             border-radius: 1rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -250,6 +250,78 @@
             gap: 0.5rem;
             justify-content: flex-end;
             margin-top: 1.5rem;
+        }
+
+        /* Hub de Formulários */
+        .hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .hub-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hub-card:hover {
+            border-color: #6366f1;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
+        }
+
+        .hub-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #6366f1, #4f46e5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .hub-card:hover::before {
+            opacity: 1;
+        }
+
+        .hub-card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hub-card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .hub-card-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .hub-card-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .hub-card-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
 
         /* Menu Principal */
@@ -525,6 +597,36 @@
             font-family: monospace;
         }
 
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb-item {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-item:hover {
+            color: #4f46e5;
+        }
+
+        .breadcrumb-item.ativo {
+            color: #1f2937;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        .breadcrumb-separator {
+            color: #d1d5db;
+        }
+
         /* Utilitários */
         .oculto {
             display: none !important;
@@ -579,6 +681,41 @@
                 padding: 0.5rem;
                 font-size: 0.875rem;
             }
+
+            .hub-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animações */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .msg-flutuante {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
         }
     </style>
 </head>
@@ -603,10 +740,25 @@
     </div>
 
     <div class="container">
-        <h1>📋 Controle de Coletas de Equipamentos</h1>
+        <!-- TELA HUB - Seleção de Tipo de Formulário -->
+        <div id="telaHub" class="tela">
+            <h1>🗂️ Sistema de Coletas</h1>
+            <p class="text-center" style="color: #6b7280; margin-bottom: 1rem;">
+                Selecione o tipo de formulário para iniciar
+            </p>
+            <div id="hubGrid" class="hub-grid"></div>
+        </div>
 
-        <!-- Tela Principal -->
-        <div id="telaPrincipal" class="tela">
+        <!-- TELA PRINCIPAL - Menu do Formulário Selecionado -->
+        <div id="telaPrincipal" class="tela oculto">
+            <div class="breadcrumb">
+                <span class="breadcrumb-item" onclick="sistema.irParaHub()">🏠 Início</span>
+                <span class="breadcrumb-separator">›</span>
+                <span id="breadcrumbTipo" class="breadcrumb-item ativo"></span>
+            </div>
+            
+            <h1 id="tituloPrincipal"></h1>
+            
             <div class="menu-principal">
                 <button id="btnNovaColeta" class="btn-primary">
                     ➕ Criar Nova Coleta
@@ -615,11 +767,25 @@
                     📂 Acessar Coleta Existente
                 </button>
             </div>
+            
+            <div style="display: flex; justify-content: center; margin-top: 2rem;">
+                <button onclick="sistema.irParaHub()" class="btn-secondary">
+                    ⬅️ Voltar ao Início
+                </button>
+            </div>
         </div>
 
-        <!-- Tela de Lista de Coletas -->
+        <!-- TELA LISTA DE COLETAS -->
         <div id="telaListaColetas" class="tela oculto">
-            <h2>📋 Suas Coletas</h2>
+            <div class="breadcrumb">
+                <span class="breadcrumb-item" onclick="sistema.irParaHub()">🏠 Início</span>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item" onclick="sistema.voltarPrincipal()" id="breadcrumbTipo2"></span>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item ativo">Coletas</span>
+            </div>
+            
+            <h2 id="tituloListaColetas">📋 Suas Coletas</h2>
             <div id="listaColetas" class="lista-coletas"></div>
             <div style="display: flex; justify-content: center; margin-top: 2rem;">
                 <button id="btnVoltarPrincipal" class="btn-secondary">
@@ -628,8 +794,18 @@
             </div>
         </div>
 
-        <!-- Tela de Dados da Coleta -->
+        <!-- TELA DADOS DA COLETA -->
         <div id="telaDadosColeta" class="tela oculto">
+            <div class="breadcrumb">
+                <span class="breadcrumb-item" onclick="sistema.irParaHub()">🏠 Início</span>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item" onclick="sistema.voltarPrincipal()" id="breadcrumbTipo3"></span>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item" onclick="sistema.irParaListaColetas()" >Coletas</span>
+                <span class="breadcrumb-separator">›</span>
+                <span id="breadcrumbColeta" class="breadcrumb-item ativo"></span>
+            </div>
+            
             <h2 id="tituloColetaAtual"></h2>
             
             <div class="abas">
@@ -644,133 +820,13 @@
 
             <div id="mensagem" class="mensagem"></div>
 
-            <!-- Conteúdo do Formulário -->
+            <!-- Conteúdo do Formulário - Renderizado Dinamicamente -->
             <div id="conteudoFormulario" class="conteudo-aba">
                 <h3>➕ Adicionar Novo Item</h3>
                 <form id="formularioCadastro" class="form-grid">
-                    <!-- Dados do Equipamento -->
-                    <div>
-                        <label for="tipo">TIPO:<span style="color: red;">*</span></label>
-                        <select id="tipo" required>
-                            <option value="">Selecione...</option>
-                            <option value="GABINETE">GABINETE</option>
-                            <option value="NOTEBOOK">NOTEBOOK</option>
-                            <option value="MONITOR">MONITOR</option>
-                            <option value="RAMAL">RAMAL</option>
-                        </select>
-                    </div>
+                    <!-- Campos serão renderizados dinamicamente -->
+                    <div id="camposFormulario"></div>
                     
-                    <div class="campo-combo">
-                        <label for="marca">MARCA:<span style="color: red;">*</span></label>
-                        <select id="marca" required>
-                            <option value="">Selecione o tipo primeiro...</option>
-                        </select>
-                        <div id="marcaManualContainer" class="input-manual">
-                            <label class="label-manual">Digite a marca:</label>
-                            <input type="text" id="marcaManual" placeholder="Ex: SAMSUNG">
-                        </div>
-                    </div>
-                    
-                    <div class="campo-combo">
-                        <label for="modelo">MODELO:</label>
-                        <select id="modelo">
-                            <option value="">Selecione a marca primeiro...</option>
-                        </select>
-                        <div id="modeloManualContainer" class="input-manual">
-                            <label class="label-manual">Digite o modelo:</label>
-                            <input type="text" id="modeloManual" placeholder="Ex: OPTIPLEX 790">
-                        </div>
-                        <div id="autocompleteModelo" class="autocomplete-lista"></div>
-                    </div>
-
-                    <!-- Patrimônio -->
-                    <div>
-                        <label for="numeroSerie">NÚMERO DE SÉRIE:</label>
-                        <input type="text" id="numeroSerie">
-                    </div>
-                    
-                    <div>
-                        <label for="patrimonioSiads">PAT. SIADS:</label>
-                        <input type="number" id="patrimonioSiads">
-                    </div>
-                    
-                    <div>
-                        <label for="patrimonioEbserh">PAT. EBSERH:</label>
-                        <input type="number" id="patrimonioEbserh">
-                    </div>
-                    
-                    <div>
-                        <label for="patrimonioFub">PAT. FUB:</label>
-                        <input type="text" id="patrimonioFub">
-                    </div>
-
-                    <!-- Localização -->
-                    <div>
-                        <label for="predio">PRÉDIO:<span style="color: red;">*</span></label>
-                        <select id="predio" required>
-                            <option value="">Selecione...</option>
-                            <option value="ADMINISTRAÇÃO">ADMINISTRAÇÃO</option>
-                            <option value="UNIDADE 1">UNIDADE 1</option>
-                            <option value="UNIDADE 2">UNIDADE 2</option>
-                            <option value="UCA">UCA</option>
-                            <option value="AMBULATÓRIO 1">AMBULATÓRIO 1</option>
-                            <option value="AMBULATÓRIO 2">AMBULATÓRIO 2</option>
-                            <option value="UNACON">UNACON</option>
-                            <option value="SIF">SIF</option>
-                            <option value="SEGURANÇA">SEGURANÇA</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label for="andar">ANDAR:<span style="color: red;">*</span></label>
-                        <select id="andar" required>
-                            <option value="">Selecione...</option>
-                            <option value="CPA">CPA</option>
-                            <option value="SUBSOLO">SUBSOLO</option>
-                            <option value="TÉRREO">TÉRREO</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    
-                    <div class="campo-combo">
-                        <label for="setor">SETOR:<span style="color: red;">*</span></label>
-                        <select id="setor" required>
-                            <option value="">Digite ou selecione...</option>
-                        </select>
-                        <div id="setorManualContainer" class="input-manual">
-                            <label class="label-manual">Digite o setor:</label>
-                            <input type="text" id="setorManual" placeholder="Ex: ALMOXARIFADO">
-                        </div>
-                    </div>
-
-                    <div class="campo-combo">
-                        <label for="local">LOCAL:<span style="color: red;">*</span></label>
-                        <select id="local" required>
-                            <option value="">Digite ou selecione...</option>
-                        </select>
-                        <div id="localManualContainer" class="input-manual">
-                            <label class="label-manual">Digite o local/sala:</label>
-                            <input type="text" id="localManual" placeholder="Ex: SALA 101">
-                        </div>
-                    </div>
-
-                    <!-- Detalhes -->
-                    <div>
-                        <label for="vinculo">VÍNCULO:</label>
-                        <input type="number" id="vinculo" placeholder="Nº patrimônio do computador">
-                        <div class="dica">
-                            💡 Para MONITOR/RAMAL: informe o PAT do computador vinculado
-                        </div>
-                    </div>
-                    
-                    <div class="full-width">
-                        <label for="observacao">OBSERVAÇÃO:</label>
-                        <textarea id="observacao" rows="3"></textarea>
-                    </div>
-
                     <div class="form-actions">
                         <button type="button" id="btnLimparForm" class="btn-secondary">
                             🗑️ Limpar
@@ -787,23 +843,8 @@
                 <h3>📊 Itens Registrados</h3>
                 <div class="tabela-container">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>Tipo</th>
-                                <th>Marca</th>
-                                <th>Modelo</th>
-                                <th>Nº de Série</th>
-                                <th>PAT. SIADS</th>
-                                <th>PAT. EBSERH</th>
-                                <th>PAT. FUB</th>
-                                <th>Prédio</th>
-                                <th>Andar</th>
-                                <th>Setor</th>
-                                <th>Local</th>
-                                <th>Vínculo</th>
-                                <th>Observação</th>
-                                <th class="text-center">Ações</th>
-                            </tr>
+                        <thead id="cabecalhoTabela">
+                            <!-- Cabeçalho renderizado dinamicamente -->
                         </thead>
                         <tbody id="corpoTabela"></tbody>
                     </table>
@@ -863,515 +904,364 @@
 
     <script>
         // ===========================================================================
-        // SISTEMA DE COLETAS COM RELAÇÕES INTELIGENTES E CAMPOS DINÂMICOS
+        // SISTEMA DE COLETAS MULTI-FORMULÁRIO
         // ===========================================================================
 
         class SistemaColetas {
             constructor() {
-                this.colecoes = {};
+                // Estado
+                this.tipoAtual = null;
                 this.colecaoAtual = null;
                 this.dadosAtuais = [];
                 this.indiceEdicao = -1;
                 this.promptInstalacao = null;
                 
-                // Base de dados de marcas e modelos
-                this.baseDados = {
-                    MONITOR: {
-                        'ASUS': ['MV16AMT'],
-                        'ACER': ['X173W'],
-                        'DELL': ['E157FP', 'E1910', 'E1914HC', 'P2422HE', 'ST2420L', 'U2413'],
-                        'ITAUTEC': ['W1942PT'],
-                        'AOC': ['E2023PWD', 'e2243Fwk', '22P2ES', '22P2WG5', '24E3QF', '24P1U', '24P1W1', '717wx'],
-                        'POSITIVO': ['22MP55PJ-B', '24BL550J-B'],
-                        'LENOVO': ['LS1920wG', 'T23i-10'],
-                        'LG': ['22BN550Y-B'],
-                        'DATEN': ['DM238V', '20M35PD-M'],
-                        'HP': ['E190i', 'E201', 'E221', 'E243i', 'LA2006x', 'LA1905wg', 'V206hz', 'V223hz', 'V225hz', 'w17e', 'Z27q G3'],
-                        'SAMSUNG': ['S19B300', 'S20B300', 'S24D332']
-                    },
-                    GABINETE: {
-                        'HP': ['Compaq Pro 6305', 'Compaq 6005 Pro'],
-                        'ITAUTEC': ['SM3322'],
-                        'DATEN': ['DC1C-S', 'DC3D-U', 'DC6A-U', 'DC6E-S'],
-                        'LENOVO': ['P330'],
-                        'POSITIVO': ['C4400', 'C6200', 'C6400']
-                    },
-                    NOTEBOOK: {
-                        'DELL': [],
-                        'HP': [],
-                        'LENOVO': [],
-                        'ASUS': [],
-                        'ACER': [],
-                        'POSITIVO': [],
-                        'SAMSUNG': []
-                    },
-                    RAMAL: {}
-                };
+                // Dados persistidos
+                this.colecoes = {};          // { tipo: { nomeColeta: [itens] } }
+                this.dadosPersonalizados = {}; // { tipo: { marca: [modelos] } }
+                this.historico = {};          // { tipo: { setores: {}, locais: {} } }
                 
-                // Marcas, modelos, setores e locais personalizados
-                this.dadosPersonalizados = this.carregarDadosPersonalizados();
-                
-                // Histórico de setores e locais com frequência
-                this.historico = this.carregarHistorico();
+                // Configuração dos tipos de formulário
+                this.tiposFormulario = this.definirTiposFormulario();
                 
                 this.inicializar();
             }
 
-            // Inicialização
+            // ===========================================================================
+            // DEFINIÇÃO DOS TIPOS DE FORMULÁRIO
+            // ===========================================================================
+            
+            definirTiposFormulario() {
+                return {
+                    equipamentos: {
+                        id: 'equipamentos',
+                        nome: 'Controle de Coletas de Equipamentos',
+                        nomeResumido: 'Equipamentos',
+                        icone: '📋',
+                        descricao: 'Cadastro de gabinetes, notebooks, monitores e ramais',
+                        cor: '#4f46e5',
+                        
+                        // Base de dados específica
+                        baseDados: {
+                            MONITOR: {
+                                'ASUS': ['MV16AMT'],
+                                'ACER': ['X173W'],
+                                'DELL': ['E157FP', 'E1910', 'E1914HC', 'P2422HE', 'ST2420L', 'U2413'],
+                                'ITAUTEC': ['W1942PT'],
+                                'AOC': ['E2023PWD', 'e2243Fwk', '22P2ES', '22P2WG5', '24E3QF', '24P1U', '24P1W1', '717wx'],
+                                'POSITIVO': ['22MP55PJ-B', '24BL550J-B'],
+                                'LENOVO': ['LS1920wG', 'T23i-10'],
+                                'LG': ['22BN550Y-B'],
+                                'DATEN': ['DM238V', '20M35PD-M'],
+                                'HP': ['E190i', 'E201', 'E221', 'E243i', 'LA2006x', 'LA1905wg', 'V206hz', 'V223hz', 'V225hz', 'w17e', 'Z27q G3'],
+                                'SAMSUNG': ['S19B300', 'S20B300', 'S24D332']
+                            },
+                            GABINETE: {
+                                'HP': ['Compaq Pro 6305', 'Compaq 6005 Pro'],
+                                'ITAUTEC': ['SM3322'],
+                                'DATEN': ['DC1C-S', 'DC3D-U', 'DC6A-U', 'DC6E-S'],
+                                'LENOVO': ['P330'],
+                                'POSITIVO': ['C4400', 'C6200', 'C6400']
+                            },
+                            NOTEBOOK: {
+                                'DELL': [], 'HP': [], 'LENOVO': [], 'ASUS': [],
+                                'ACER': [], 'POSITIVO': [], 'SAMSUNG': []
+                            },
+                            RAMAL: {}
+                        },
+                        
+                        // Definição dos campos
+                        campos: [
+                            {
+                                id: 'tipo',
+                                label: 'TIPO',
+                                tipo: 'select',
+                                obrigatorio: true,
+                                opcoes: ['GABINETE', 'NOTEBOOK', 'MONITOR', 'RAMAL'],
+                                gatilho: 'atualizarMarcas' // Ação especial ao mudar
+                            },
+                            {
+                                id: 'marca',
+                                label: 'MARCA',
+                                tipo: 'select-dinamico',
+                                obrigatorio: true,
+                                dependeDe: 'tipo',
+                                permitirOutro: true
+                            },
+                            {
+                                id: 'modelo',
+                                label: 'MODELO',
+                                tipo: 'select-dinamico',
+                                obrigatorio: false,
+                                dependeDe: 'marca',
+                                permitirOutro: true
+                            },
+                            {
+                                id: 'numeroSerie',
+                                label: 'NÚMERO DE SÉRIE',
+                                tipo: 'text',
+                                obrigatorio: false
+                            },
+                            {
+                                id: 'patrimonioSiads',
+                                label: 'PAT. SIADS',
+                                tipo: 'number',
+                                obrigatorio: false
+                            },
+                            {
+                                id: 'patrimonioEbserh',
+                                label: 'PAT. EBSERH',
+                                tipo: 'number',
+                                obrigatorio: false
+                            },
+                            {
+                                id: 'patrimonioFub',
+                                label: 'PAT. FUB',
+                                tipo: 'text',
+                                obrigatorio: false
+                            },
+                            {
+                                id: 'predio',
+                                label: 'PRÉDIO',
+                                tipo: 'select',
+                                obrigatorio: true,
+                                opcoes: ['ADMINISTRAÇÃO', 'UNIDADE 1', 'UNIDADE 2', 'UCA', 
+                                         'AMBULATÓRIO 1', 'AMBULATÓRIO 2', 'UNACON', 'SIF', 'SEGURANÇA']
+                            },
+                            {
+                                id: 'andar',
+                                label: 'ANDAR',
+                                tipo: 'select',
+                                obrigatorio: true,
+                                opcoes: ['CPA', 'SUBSOLO', 'TÉRREO', '1', '2', '3', '4']
+                            },
+                            {
+                                id: 'setor',
+                                label: 'SETOR',
+                                tipo: 'select-historico',
+                                obrigatorio: true,
+                                permitirOutro: true,
+                                historicoKey: 'setores'
+                            },
+                            {
+                                id: 'local',
+                                label: 'LOCAL',
+                                tipo: 'select-historico',
+                                obrigatorio: true,
+                                permitirOutro: true,
+                                historicoKey: 'locais'
+                            },
+                            {
+                                id: 'vinculo',
+                                label: 'VÍNCULO',
+                                tipo: 'number',
+                                obrigatorio: false,
+                                placeholder: 'Nº patrimônio do computador',
+                                dica: '💡 Para MONITOR/RAMAL: informe o PAT do computador vinculado'
+                            },
+                            {
+                                id: 'observacao',
+                                label: 'OBSERVAÇÃO',
+                                tipo: 'textarea',
+                                obrigatorio: false,
+                                fullWidth: true
+                            }
+                        ],
+                        
+                        // Colunas da tabela (exportação e visualização)
+                        colunas: [
+                            { id: 'tipo', label: 'Tipo' },
+                            { id: 'marca', label: 'Marca' },
+                            { id: 'modelo', label: 'Modelo' },
+                            { id: 'numeroSerie', label: 'Nº de Série' },
+                            { id: 'patrimonioSiads', label: 'PAT. SIADS' },
+                            { id: 'patrimonioEbserh', label: 'PAT. EBSERH' },
+                            { id: 'patrimonioFub', label: 'PAT. FUB' },
+                            { id: 'predio', label: 'Prédio' },
+                            { id: 'andar', label: 'Andar' },
+                            { id: 'setor', label: 'Setor' },
+                            { id: 'local', label: 'Local' },
+                            { id: 'vinculo', label: 'Vínculo' },
+                            { id: 'observacao', label: 'Observação' }
+                        ],
+                        
+                        // Validação customizada
+                        validarItem: (item) => {
+                            const patrimonios = [item.numeroSerie, item.patrimonioSiads, 
+                                                item.patrimonioEbserh, item.patrimonioFub];
+                            if (!patrimonios.some(p => p && p !== '')) {
+                                return { valido: false, erro: 'Informe pelo menos um número de patrimônio' };
+                            }
+                            return { valido: true };
+                        }
+                    }
+                    
+                    // Adicione outros tipos aqui conforme necessário
+                    // Exemplo:
+                    // moveis: { ... }
+                    // veiculos: { ... }
+                };
+            }
+
+            // ===========================================================================
+            // INICIALIZAÇÃO
+            // ===========================================================================
+            
             inicializar() {
                 this.carregarDados();
-                this.configurarEventos();
-                this.configurarCamposDinamicos();
-                this.configurarCamposLocalizacao();
+                this.migrarDadosLegados();
+                this.configurarEventosGlobais();
                 this.configurarPWA();
-                this.mostrarTela('telaPrincipal');
+                this.renderizarHub();
+                this.mostrarTela('telaHub');
             }
 
-            // Histórico e frequência
-            carregarHistorico() {
-                try {
-                    const hist = localStorage.getItem('locationHistory');
-                    return hist ? JSON.parse(hist) : { setores: {}, locais: {} };
-                } catch (e) {
-                    return { setores: {}, locais: {} };
-                }
-            }
-
-            salvarHistorico() {
-                localStorage.setItem('locationHistory', JSON.stringify(this.historico));
-            }
-
-            adicionarHistorico(tipo, valor) {
-                if (!valor) return;
-                
-                valor = valor.toUpperCase().trim();
-                
-                if (tipo === 'setor') {
-                    this.historico.setores[valor] = (this.historico.setores[valor] || 0) + 1;
-                } else if (tipo === 'local') {
-                    this.historico.locais[valor] = (this.historico.locais[valor] || 0) + 1;
-                }
-                
-                this.salvarHistorico();
-            }
-
-            obterSetoresOrdenados() {
-                return Object.entries(this.historico.setores)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([setor, freq]) => ({ valor: setor, frequencia: freq }));
-            }
-
-            obterLocaisOrdenados() {
-                return Object.entries(this.historico.locais)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([local, freq]) => ({ valor: local, frequencia: freq }));
-            }
-
-            // Dados Personalizados
-            carregarDadosPersonalizados() {
-                try {
-                    const dados = localStorage.getItem('equipmentCustomData');
-                    return dados ? JSON.parse(dados) : { MONITOR: {}, GABINETE: {}, NOTEBOOK: {}, RAMAL: {} };
-                } catch (e) {
-                    return { MONITOR: {}, GABINETE: {}, NOTEBOOK: {}, RAMAL: {} };
-                }
-            }
-
-            salvarDadosPersonalizados() {
-                localStorage.setItem('equipmentCustomData', JSON.stringify(this.dadosPersonalizados));
-            }
-
-            adicionarDadoPersonalizado(tipo, marca, modelo) {
-                if (!tipo || !marca) return;
-                
-                marca = marca.toUpperCase();
-                
-                if (!this.dadosPersonalizados[tipo]) {
-                    this.dadosPersonalizados[tipo] = {};
-                }
-                
-                if (!this.dadosPersonalizados[tipo][marca]) {
-                    this.dadosPersonalizados[tipo][marca] = [];
-                }
-                
-                if (modelo && !this.dadosPersonalizados[tipo][marca].includes(modelo)) {
-                    this.dadosPersonalizados[tipo][marca].push(modelo);
-                    this.salvarDadosPersonalizados();
-                }
-            }
-
-            obterMarcas(tipo) {
-                if (!tipo) return [];
-                
-                const marcasBase = Object.keys(this.baseDados[tipo] || {});
-                const marcasPersonalizadas = Object.keys(this.dadosPersonalizados[tipo] || {});
-                const todasMarcas = [...new Set([...marcasBase, ...marcasPersonalizadas])];
-                
-                return todasMarcas.sort();
-            }
-
-            obterModelos(tipo, marca) {
-                if (!tipo || !marca) return [];
-                
-                marca = marca.toUpperCase();
-                const modelosBase = this.baseDados[tipo]?.[marca] || [];
-                const modelosPersonalizados = this.dadosPersonalizados[tipo]?.[marca] || [];
-                const todosModelos = [...new Set([...modelosBase, ...modelosPersonalizados])];
-                
-                return todosModelos.sort();
-            }
-
-            // Campos de Localização Inteligentes
-            configurarCamposLocalizacao() {
-                const setorSelect = document.getElementById('setor');
-                const localSelect = document.getElementById('local');
-                const setorManual = document.getElementById('setorManual');
-                const localManual = document.getElementById('localManual');
-                const setorManualContainer = document.getElementById('setorManualContainer');
-                const localManualContainer = document.getElementById('localManualContainer');
-
-                // Preencher setores
-                this.atualizarListaSetores();
-                
-                // Preencher locais
-                this.atualizarListaLocais();
-
-                // Mudança de SETOR
-                setorSelect.addEventListener('change', () => {
-                    const setor = setorSelect.value;
-                    
-                    if (setor === 'OUTRO') {
-                        setorManualContainer.classList.add('visivel');
-                        setorSelect.removeAttribute('required');
-                        setorManual.setAttribute('required', '');
-                        setorManual.focus();
-                    } else {
-                        setorManualContainer.classList.remove('visivel');
-                        setorSelect.setAttribute('required', '');
-                        setorManual.removeAttribute('required');
-                        setorManual.value = '';
-                    }
-                });
-
-                // Mudança de LOCAL
-                localSelect.addEventListener('change', () => {
-                    const local = localSelect.value;
-                    
-                    if (local === 'OUTRO') {
-                        localManualContainer.classList.add('visivel');
-                        localSelect.removeAttribute('required');
-                        localManual.setAttribute('required', '');
-                        localManual.focus();
-                    } else {
-                        localManualContainer.classList.remove('visivel');
-                        localSelect.setAttribute('required', '');
-                        localManual.removeAttribute('required');
-                        localManual.value = '';
-                    }
-                });
-
-                // Converter para maiúsculas
-                setorManual.addEventListener('input', () => {
-                    setorManual.value = setorManual.value.toUpperCase();
-                });
-
-                localManual.addEventListener('input', () => {
-                    localManual.value = localManual.value.toUpperCase();
-                });
-            }
-
-            atualizarListaSetores() {
-                const setorSelect = document.getElementById('setor');
-                const setores = this.obterSetoresOrdenados();
-                
-                // Limpar opções existentes
-                setorSelect.innerHTML = '<option value="">Digite ou selecione...</option>';
-                
-                if (setores.length > 0) {
-                    // Adicionar setores mais usados
-                    const top5 = setores.slice(0, 5);
-                    top5.forEach(({ valor, frequencia }) => {
-                        const option = document.createElement('option');
-                        option.value = valor;
-                        option.innerHTML = `${valor} <span class="freq-badge">${frequencia}x</span>`;
-                        option.textContent = valor;
-                        setorSelect.appendChild(option);
-                    });
-                    
-                    // Se houver mais setores, adicionar separador e resto
-                    if (setores.length > 5) {
-                        const optgroup = document.createElement('optgroup');
-                        optgroup.label = '──────────';
-                        setorSelect.appendChild(optgroup);
-                        
-                        setores.slice(5).forEach(({ valor }) => {
-                            const option = document.createElement('option');
-                            option.value = valor;
-                            option.textContent = valor;
-                            setorSelect.appendChild(option);
-                        });
-                    }
-                }
-                
-                // Sempre adicionar opção "Outro..."
-                const optionOutro = document.createElement('option');
-                optionOutro.value = 'OUTRO';
-                optionOutro.textContent = '➕ Outro...';
-                optionOutro.style.fontWeight = 'bold';
-                optionOutro.style.color = '#6366f1';
-                setorSelect.appendChild(optionOutro);
-            }
-
-            atualizarListaLocais() {
-                const localSelect = document.getElementById('local');
-                const locais = this.obterLocaisOrdenados();
-                
-                // Limpar opções existentes
-                localSelect.innerHTML = '<option value="">Digite ou selecione...</option>';
-                
-                if (locais.length > 0) {
-                    // Adicionar locais mais usados
-                    const top5 = locais.slice(0, 5);
-                    top5.forEach(({ valor, frequencia }) => {
-                        const option = document.createElement('option');
-                        option.value = valor;
-                        option.innerHTML = `${valor} <span class="freq-badge">${frequencia}x</span>`;
-                        option.textContent = valor;
-                        localSelect.appendChild(option);
-                    });
-                    
-                    // Se houver mais locais, adicionar separador e resto
-                    if (locais.length > 5) {
-                        const optgroup = document.createElement('optgroup');
-                        optgroup.label = '──────────';
-                        localSelect.appendChild(optgroup);
-                        
-                        locais.slice(5).forEach(({ valor }) => {
-                            const option = document.createElement('option');
-                            option.value = valor;
-                            option.textContent = valor;
-                            localSelect.appendChild(option);
-                        });
-                    }
-                }
-                
-                // Sempre adicionar opção "Outro..."
-                const optionOutro = document.createElement('option');
-                optionOutro.value = 'OUTRO';
-                optionOutro.textContent = '➕ Outro...';
-                optionOutro.style.fontWeight = 'bold';
-                optionOutro.style.color = '#6366f1';
-                localSelect.appendChild(optionOutro);
-            }
-
-            // Campos Dinâmicos
-            configurarCamposDinamicos() {
-                const tipoSelect = document.getElementById('tipo');
-                const marcaSelect = document.getElementById('marca');
-                const modeloSelect = document.getElementById('modelo');
-                const marcaManual = document.getElementById('marcaManual');
-                const modeloManual = document.getElementById('modeloManual');
-                const marcaManualContainer = document.getElementById('marcaManualContainer');
-                const modeloManualContainer = document.getElementById('modeloManualContainer');
-
-                // Mudança de TIPO
-                tipoSelect.addEventListener('change', () => {
-                    const tipo = tipoSelect.value;
-                    
-                    // Resetar marca e modelo
-                    marcaSelect.innerHTML = '<option value="">Selecione...</option>';
-                    modeloSelect.innerHTML = '<option value="">Selecione a marca primeiro...</option>';
-                    marcaManualContainer.classList.remove('visivel');
-                    modeloManualContainer.classList.remove('visivel');
-                    marcaManual.value = '';
-                    modeloManual.value = '';
-                    
-                    if (tipo) {
-                        // Preencher marcas
-                        const marcas = this.obterMarcas(tipo);
-                        
-                        if (marcas.length > 0) {
-                            marcas.forEach(marca => {
-                                const option = document.createElement('option');
-                                option.value = marca;
-                                option.textContent = marca;
-                                marcaSelect.appendChild(option);
-                            });
-                            
-                            // Adicionar opção "Outro..."
-                            const optionOutro = document.createElement('option');
-                            optionOutro.value = 'OUTRO';
-                            optionOutro.textContent = '➕ Outro...';
-                            optionOutro.style.fontWeight = 'bold';
-                            optionOutro.style.color = '#6366f1';
-                            marcaSelect.appendChild(optionOutro);
-                        } else {
-                            // Se não há marcas predefinidas, mostrar input manual
-                            marcaManualContainer.classList.add('visivel');
-                            marcaSelect.removeAttribute('required');
-                            marcaManual.setAttribute('required', '');
-                        }
-                    }
-                });
-
-                // Mudança de MARCA
-                marcaSelect.addEventListener('change', () => {
-                    const tipo = tipoSelect.value;
-                    const marca = marcaSelect.value;
-                    
-                    // Resetar modelo
-                    modeloSelect.innerHTML = '<option value="">Selecione...</option>';
-                    modeloManualContainer.classList.remove('visivel');
-                    modeloManual.value = '';
-                    
-                    if (marca === 'OUTRO') {
-                        // Mostrar input manual para marca
-                        marcaManualContainer.classList.add('visivel');
-                        marcaSelect.removeAttribute('required');
-                        marcaManual.setAttribute('required', '');
-                        marcaManual.focus();
-                    } else {
-                        marcaManualContainer.classList.remove('visivel');
-                        marcaSelect.setAttribute('required', '');
-                        marcaManual.removeAttribute('required');
-                        
-                        if (tipo && marca) {
-                            // Preencher modelos
-                            const modelos = this.obterModelos(tipo, marca);
-                            
-                            if (modelos.length > 0) {
-                                modelos.forEach(modelo => {
-                                    const option = document.createElement('option');
-                                    option.value = modelo;
-                                    option.textContent = modelo;
-                                    modeloSelect.appendChild(option);
-                                });
-                            }
-                            
-                            // Sempre adicionar opção "Outro..."
-                            const optionOutro = document.createElement('option');
-                            optionOutro.value = 'OUTRO';
-                            optionOutro.textContent = '➕ Outro...';
-                            optionOutro.style.fontWeight = 'bold';
-                            optionOutro.style.color = '#6366f1';
-                            modeloSelect.appendChild(optionOutro);
-                        }
-                    }
-                });
-
-                // Mudança de MODELO
-                modeloSelect.addEventListener('change', () => {
-                    const modelo = modeloSelect.value;
-                    
-                    if (modelo === 'OUTRO') {
-                        modeloManualContainer.classList.add('visivel');
-                        modeloManual.focus();
-                    } else {
-                        modeloManualContainer.classList.remove('visivel');
-                        modeloManual.value = '';
-                    }
-                });
-
-                // Validação de entrada manual
-                marcaManual.addEventListener('input', () => {
-                    marcaManual.value = marcaManual.value.toUpperCase();
-                });
-            }
-
-            // PWA
-            configurarPWA() {
-                // Service Worker
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('sw.js')
-                        .then(() => console.log('Service Worker registrado'))
-                        .catch(err => console.log('Erro no SW:', err));
-                }
-
-                // Prompt de instalação
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    this.promptInstalacao = e;
-                    document.getElementById('promptInstalacao').classList.add('visivel');
-                });
-
-                // Status de conexão
-                const atualizarStatus = () => {
-                    const statusEl = document.getElementById('statusPWA');
-                    const textoEl = document.getElementById('textoStatus');
-                    
-                    if (navigator.onLine) {
-                        textoEl.textContent = '🟢 Online';
-                        statusEl.className = 'status-pwa online';
-                    } else {
-                        textoEl.textContent = '🔴 Offline';
-                        statusEl.className = 'status-pwa offline';
-                    }
-                    
-                    statusEl.style.display = 'block';
-                    setTimeout(() => statusEl.style.display = 'none', 3000);
-                };
-
-                window.addEventListener('online', atualizarStatus);
-                window.addEventListener('offline', atualizarStatus);
-            }
-
-            // Armazenamento
+            // ===========================================================================
+            // ARMAZENAMENTO E MIGRAÇÃO
+            // ===========================================================================
+            
             carregarDados() {
                 try {
-                    const dados = localStorage.getItem('allEquipmentCollections');
-                    if (dados) {
-                        const parsed = JSON.parse(dados);
-                        // Migração de dados antigos
-                        for (let colecao in parsed) {
-                            if (Array.isArray(parsed[colecao])) {
-                                parsed[colecao] = parsed[colecao].map(item => {
-                                    // Migrar MINIPC para GABINETE
-                                    if (item.type === 'MINIPC') {
-                                        item.type = 'GABINETE';
-                                    }
-                                    // Migrar campo sector antigo para setor e local
-                                    if (item.sector && !item.setor && !item.local) {
-                                        // Tentar dividir por hífen, barra ou vírgula
-                                        const partes = item.sector.split(/[-/,]/);
-                                        if (partes.length > 1) {
-                                            item.setor = partes[0].trim();
-                                            item.local = partes[1].trim();
-                                        } else {
-                                            item.setor = item.sector;
-                                            item.local = item.sector;
-                                        }
-                                    }
-                                    return item;
-                                });
-                            }
-                        }
-                        this.colecoes = parsed;
+                    // Carregar coleções
+                    const colecoes = localStorage.getItem('sistemaColecoesV2');
+                    if (colecoes) {
+                        this.colecoes = JSON.parse(colecoes);
+                    }
+                    
+                    // Carregar dados personalizados
+                    const personalizados = localStorage.getItem('sistemaPersonalizadosV2');
+                    if (personalizados) {
+                        this.dadosPersonalizados = JSON.parse(personalizados);
+                    }
+                    
+                    // Carregar histórico
+                    const historico = localStorage.getItem('sistemaHistoricoV2');
+                    if (historico) {
+                        this.historico = JSON.parse(historico);
                     }
                 } catch (erro) {
                     console.error('Erro ao carregar dados:', erro);
-                    this.colecoes = {};
+                }
+            }
+
+            migrarDadosLegados() {
+                // Migrar dados do formato antigo (v1) para o novo (v2)
+                try {
+                    const dadosAntigos = localStorage.getItem('allEquipmentCollections');
+                    if (dadosAntigos && !this.colecoes.equipamentos) {
+                        const parsed = JSON.parse(dadosAntigos);
+                        
+                        this.colecoes.equipamentos = {};
+                        
+                        for (let nomeColeta in parsed) {
+                            if (Array.isArray(parsed[nomeColeta])) {
+                                this.colecoes.equipamentos[nomeColeta] = parsed[nomeColeta].map(item => {
+                                    // Normalizar campos
+                                    const itemNovo = {
+                                        tipo: item.type === 'MINIPC' ? 'GABINETE' : item.type,
+                                        marca: item.brand || '',
+                                        modelo: item.model || '',
+                                        numeroSerie: item.serialNumber || '',
+                                        patrimonioSiads: item.patSiads || '',
+                                        patrimonioEbserh: item.patEbserh || '',
+                                        patrimonioFub: item.patFub || '',
+                                        predio: item.building || '',
+                                        andar: item.floor || '',
+                                        setor: item.setor || (item.sector ? item.sector.split(/[-/,]/)[0]?.trim() : ''),
+                                        local: item.local || (item.sector ? item.sector.split(/[-/,]/)[1]?.trim() : ''),
+                                        vinculo: item.vinculo || item.user || '',
+                                        observacao: item.observation || ''
+                                    };
+                                    return itemNovo;
+                                });
+                            }
+                        }
+                        
+                        this.salvarDados();
+                        console.log('Migração de dados legados concluída');
+                    }
+                    
+                    // Migrar histórico antigo
+                    const historicoAntigo = localStorage.getItem('locationHistory');
+                    if (historicoAntigo && !this.historico.equipamentos) {
+                        this.historico.equipamentos = JSON.parse(historicoAntigo);
+                        this.salvarHistorico();
+                    }
+                    
+                    // Migrar dados personalizados antigos
+                    const persAntigo = localStorage.getItem('equipmentCustomData');
+                    if (persAntigo && !this.dadosPersonalizados.equipamentos) {
+                        this.dadosPersonalizados.equipamentos = JSON.parse(persAntigo);
+                        this.salvarDadosPersonalizados();
+                    }
+                } catch (erro) {
+                    console.error('Erro na migração:', erro);
                 }
             }
 
             salvarDados() {
                 try {
-                    localStorage.setItem('allEquipmentCollections', JSON.stringify(this.colecoes));
+                    localStorage.setItem('sistemaColecoesV2', JSON.stringify(this.colecoes));
                 } catch (erro) {
                     console.error('Erro ao salvar:', erro);
                     this.mostrarMensagem('Erro ao salvar dados', 'erro');
                 }
             }
 
-            // Navegação
+            salvarDadosPersonalizados() {
+                localStorage.setItem('sistemaPersonalizadosV2', JSON.stringify(this.dadosPersonalizados));
+            }
+
+            salvarHistorico() {
+                localStorage.setItem('sistemaHistoricoV2', JSON.stringify(this.historico));
+            }
+
+            // ===========================================================================
+            // NAVEGAÇÃO
+            // ===========================================================================
+            
             mostrarTela(idTela) {
-                document.querySelectorAll('.tela').forEach(tela => {
-                    tela.classList.add('oculto');
-                });
+                document.querySelectorAll('.tela').forEach(tela => tela.classList.add('oculto'));
                 document.getElementById(idTela).classList.remove('oculto');
                 
                 if (idTela === 'telaDadosColeta') {
                     this.mostrarAba('formulario');
                 }
+            }
+
+            irParaHub() {
+                this.tipoAtual = null;
+                this.colecaoAtual = null;
+                this.mostrarTela('telaHub');
+            }
+
+            voltarPrincipal() {
+                this.colecaoAtual = null;
+                this.mostrarTela('telaPrincipal');
+            }
+
+            irParaListaColetas() {
+                this.renderizarListaColecoes();
+                this.mostrarTela('telaListaColetas');
+            }
+
+            selecionarTipo(tipoId) {
+                this.tipoAtual = tipoId;
+                const tipo = this.tiposFormulario[tipoId];
+                
+                // Atualizar títulos
+                document.getElementById('tituloPrincipal').innerHTML = `${tipo.icone} ${tipo.nome}`;
+                document.getElementById('breadcrumbTipo').textContent = tipo.nomeResumido;
+                document.getElementById('breadcrumbTipo2').textContent = tipo.nomeResumido;
+                document.getElementById('breadcrumbTipo3').textContent = tipo.nomeResumido;
+                document.getElementById('tituloListaColetas').innerHTML = `📋 Coletas de ${tipo.nomeResumido}`;
+                
+                // Inicializar estruturas se não existirem
+                if (!this.colecoes[tipoId]) this.colecoes[tipoId] = {};
+                if (!this.dadosPersonalizados[tipoId]) this.dadosPersonalizados[tipoId] = {};
+                if (!this.historico[tipoId]) this.historico[tipoId] = { setores: {}, locais: {} };
+                
+                this.mostrarTela('telaPrincipal');
             }
 
             mostrarAba(aba) {
@@ -1394,25 +1284,50 @@
                 }
             }
 
-            // Mensagens
-            mostrarMensagem(texto, tipo = 'sucesso') {
-                const mensagem = document.getElementById('mensagem');
-                mensagem.textContent = texto;
-                mensagem.className = `mensagem ${tipo} visivel`;
-                setTimeout(() => mensagem.classList.remove('visivel'), 3000);
+            // ===========================================================================
+            // RENDERIZAÇÃO DO HUB
+            // ===========================================================================
+            
+            renderizarHub() {
+                const grid = document.getElementById('hubGrid');
+                grid.innerHTML = '';
+                
+                for (let tipoId in this.tiposFormulario) {
+                    const tipo = this.tiposFormulario[tipoId];
+                    const qtdColetas = Object.keys(this.colecoes[tipoId] || {}).length;
+                    const qtdItens = Object.values(this.colecoes[tipoId] || {})
+                        .reduce((acc, arr) => acc + arr.length, 0);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'hub-card';
+                    card.onclick = () => this.selecionarTipo(tipoId);
+                    card.innerHTML = `
+                        <div class="hub-card-icon">${tipo.icone}</div>
+                        <div class="hub-card-title">${tipo.nomeResumido}</div>
+                        <div class="hub-card-desc">${tipo.descricao}</div>
+                        <div class="hub-card-stats">
+                            <span class="hub-card-stat">📁 ${qtdColetas} coletas</span>
+                            <span class="hub-card-stat">📄 ${qtdItens} itens</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
             }
 
-            // Coleções
+            // ===========================================================================
+            // COLEÇÕES
+            // ===========================================================================
+            
             async criarColecao() {
                 const nome = await this.abrirModalInput('Nova Coleta', 'Nome da coleta:');
                 if (!nome) return;
                 
-                if (this.colecoes[nome]) {
+                if (this.colecoes[this.tipoAtual][nome]) {
                     this.mostrarMensagem('Já existe uma coleta com este nome', 'erro');
                     return;
                 }
                 
-                this.colecoes[nome] = [];
+                this.colecoes[this.tipoAtual][nome] = [];
                 this.salvarDados();
                 this.abrirColecao(nome);
                 this.mostrarMensagem(`Coleta "${nome}" criada com sucesso!`);
@@ -1420,13 +1335,15 @@
 
             abrirColecao(nome) {
                 this.colecaoAtual = nome;
-                this.dadosAtuais = this.colecoes[nome] || [];
+                this.dadosAtuais = this.colecoes[this.tipoAtual][nome] || [];
+                
+                const tipo = this.tiposFormulario[this.tipoAtual];
                 document.getElementById('tituloColetaAtual').textContent = `Coleta: ${nome}`;
+                document.getElementById('breadcrumbColeta').textContent = nome;
                 document.getElementById('contadorItens').textContent = this.dadosAtuais.length;
+                
+                this.renderizarFormulario();
                 this.mostrarTela('telaDadosColeta');
-                // Atualizar listas de setor e local ao abrir coleta
-                this.atualizarListaSetores();
-                this.atualizarListaLocais();
             }
 
             async excluirColecao(nome) {
@@ -1436,9 +1353,10 @@
                 );
                 
                 if (confirmar) {
-                    delete this.colecoes[nome];
+                    delete this.colecoes[this.tipoAtual][nome];
                     this.salvarDados();
                     this.renderizarListaColecoes();
+                    this.renderizarHub();
                     this.mostrarMensagem(`Coleta "${nome}" excluída`);
                 }
             }
@@ -1447,14 +1365,16 @@
                 const lista = document.getElementById('listaColetas');
                 lista.innerHTML = '';
                 
-                const nomes = Object.keys(this.colecoes);
+                const colecoesTipo = this.colecoes[this.tipoAtual] || {};
+                const nomes = Object.keys(colecoesTipo);
+                
                 if (nomes.length === 0) {
                     lista.innerHTML = '<p class="text-center">Nenhuma coleta criada ainda.</p>';
                     return;
                 }
                 
                 nomes.forEach(nome => {
-                    const qtdItens = this.colecoes[nome].length;
+                    const qtdItens = colecoesTipo[nome].length;
                     const item = document.createElement('div');
                     item.className = 'item-coleta';
                     item.innerHTML = `
@@ -1465,16 +1385,16 @@
                             </span>
                         </div>
                         <div class="item-coleta-acoes">
-                            <button onclick="sistema.abrirColecao('${this.escaparHTML(nome)}')" class="btn-primary btn-sm" title="Acessar coleta">
+                            <button onclick="sistema.abrirColecao('${this.escaparHTML(nome)}')" class="btn-primary btn-sm">
                                 📂 Acessar
                             </button>
-                            <button onclick="sistema.exportarDiretoCSV('${this.escaparHTML(nome)}')" class="btn-success btn-sm" title="Baixar arquivo CSV">
+                            <button onclick="sistema.exportarDiretoCSV('${this.escaparHTML(nome)}')" class="btn-success btn-sm">
                                 💾 Exportar
                             </button>
-                            <button onclick="sistema.visualizarColecao('${this.escaparHTML(nome)}')" class="btn-secondary btn-sm" title="Ver resumo da coleta">
+                            <button onclick="sistema.visualizarColecao('${this.escaparHTML(nome)}')" class="btn-secondary btn-sm">
                                 👁️ Ver
                             </button>
-                            <button onclick="sistema.excluirColecao('${this.escaparHTML(nome)}')" class="btn-danger btn-sm" title="Excluir coleta">
+                            <button onclick="sistema.excluirColecao('${this.escaparHTML(nome)}')" class="btn-danger btn-sm">
                                 🗑️
                             </button>
                         </div>
@@ -1483,71 +1403,415 @@
                 });
             }
 
-            // Itens
-            salvarItem(evento) {
-                evento.preventDefault();
+            // ===========================================================================
+            // RENDERIZAÇÃO DINÂMICA DO FORMULÁRIO
+            // ===========================================================================
+            
+            renderizarFormulario() {
+                const tipo = this.tiposFormulario[this.tipoAtual];
+                const container = document.getElementById('camposFormulario');
+                container.innerHTML = '';
                 
+                tipo.campos.forEach(campo => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = campo.fullWidth ? 'full-width' : '';
+                    
+                    if (campo.tipo === 'select-dinamico' || campo.tipo === 'select-historico') {
+                        wrapper.classList.add('campo-combo');
+                    }
+                    
+                    let html = `
+                        <label for="${campo.id}">
+                            ${campo.label}:${campo.obrigatorio ? '<span style="color: red;">*</span>' : ''}
+                        </label>
+                    `;
+                    
+                    switch (campo.tipo) {
+                        case 'text':
+                        case 'number':
+                            html += `
+                                <input type="${campo.tipo}" 
+                                       id="${campo.id}" 
+                                       ${campo.obrigatorio ? 'required' : ''}
+                                       ${campo.placeholder ? `placeholder="${campo.placeholder}"` : ''}>
+                            `;
+                            break;
+                            
+                        case 'textarea':
+                            html += `
+                                <textarea id="${campo.id}" 
+                                          rows="3"
+                                          ${campo.obrigatorio ? 'required' : ''}></textarea>
+                            `;
+                            break;
+                            
+                        case 'select':
+                            html += `
+                                <select id="${campo.id}" ${campo.obrigatorio ? 'required' : ''}>
+                                    <option value="">Selecione...</option>
+                                    ${campo.opcoes.map(op => `<option value="${op}">${op}</option>`).join('')}
+                                </select>
+                            `;
+                            break;
+                            
+                        case 'select-dinamico':
+                            html += `
+                                <select id="${campo.id}" ${campo.obrigatorio ? 'required' : ''}>
+                                    <option value="">Selecione ${campo.dependeDe || ''} primeiro...</option>
+                                </select>
+                            `;
+                            if (campo.permitirOutro) {
+                                html += `
+                                    <div id="${campo.id}ManualContainer" class="input-manual">
+                                        <label class="label-manual">Digite ${campo.label.toLowerCase()}:</label>
+                                        <input type="text" id="${campo.id}Manual" placeholder="Ex: NOVO VALOR">
+                                    </div>
+                                `;
+                            }
+                            break;
+                            
+                        case 'select-historico':
+                            html += `
+                                <select id="${campo.id}" ${campo.obrigatorio ? 'required' : ''}>
+                                    <option value="">Digite ou selecione...</option>
+                                </select>
+                            `;
+                            if (campo.permitirOutro) {
+                                html += `
+                                    <div id="${campo.id}ManualContainer" class="input-manual">
+                                        <label class="label-manual">Digite ${campo.label.toLowerCase()}:</label>
+                                        <input type="text" id="${campo.id}Manual" placeholder="Ex: NOVO VALOR">
+                                    </div>
+                                `;
+                            }
+                            break;
+                    }
+                    
+                    if (campo.dica) {
+                        html += `<div class="dica">${campo.dica}</div>`;
+                    }
+                    
+                    wrapper.innerHTML = html;
+                    container.appendChild(wrapper);
+                });
+                
+                this.configurarEventosCampos();
+                this.renderizarCabecalhoTabela();
+            }
+
+            configurarEventosCampos() {
+                const tipo = this.tiposFormulario[this.tipoAtual];
+                
+                tipo.campos.forEach(campo => {
+                    const elemento = document.getElementById(campo.id);
+                    if (!elemento) return;
+                    
+                    // Converter para maiúsculas em inputs de texto
+                    if (campo.tipo === 'text') {
+                        elemento.addEventListener('input', () => {
+                            elemento.value = elemento.value.toUpperCase();
+                        });
+                    }
+                    
+                    // Configurar select-dinamico
+                    if (campo.tipo === 'select-dinamico') {
+                        if (campo.dependeDe === 'tipo') {
+                            // Campo tipo -> atualiza marcas
+                            const tipoSelect = document.getElementById('tipo');
+                            if (tipoSelect) {
+                                tipoSelect.addEventListener('change', () => this.atualizarMarcas());
+                            }
+                        }
+                        
+                        if (campo.id === 'marca') {
+                            elemento.addEventListener('change', () => this.atualizarModelos());
+                        }
+                        
+                        if (campo.permitirOutro) {
+                            elemento.addEventListener('change', () => {
+                                this.tratarSelecaoOutro(campo.id);
+                            });
+                            
+                            const manual = document.getElementById(`${campo.id}Manual`);
+                            if (manual) {
+                                manual.addEventListener('input', () => {
+                                    manual.value = manual.value.toUpperCase();
+                                });
+                            }
+                        }
+                    }
+                    
+                    // Configurar select-historico
+                    if (campo.tipo === 'select-historico') {
+                        this.atualizarSelectHistorico(campo.id, campo.historicoKey);
+                        
+                        if (campo.permitirOutro) {
+                            elemento.addEventListener('change', () => {
+                                this.tratarSelecaoOutro(campo.id);
+                            });
+                            
+                            const manual = document.getElementById(`${campo.id}Manual`);
+                            if (manual) {
+                                manual.addEventListener('input', () => {
+                                    manual.value = manual.value.toUpperCase();
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ===========================================================================
+            // CAMPOS DINÂMICOS - MARCA/MODELO
+            // ===========================================================================
+            
+            obterMarcas(tipoEquipamento) {
+                const tipo = this.tiposFormulario[this.tipoAtual];
+                if (!tipo.baseDados || !tipoEquipamento) return [];
+                
+                const marcasBase = Object.keys(tipo.baseDados[tipoEquipamento] || {});
+                const marcasPers = Object.keys(this.dadosPersonalizados[this.tipoAtual]?.[tipoEquipamento] || {});
+                
+                return [...new Set([...marcasBase, ...marcasPers])].sort();
+            }
+
+            obterModelos(tipoEquipamento, marca) {
+                const tipo = this.tiposFormulario[this.tipoAtual];
+                if (!tipo.baseDados || !tipoEquipamento || !marca) return [];
+                
+                const modelosBase = tipo.baseDados[tipoEquipamento]?.[marca] || [];
+                const modelosPers = this.dadosPersonalizados[this.tipoAtual]?.[tipoEquipamento]?.[marca] || [];
+                
+                return [...new Set([...modelosBase, ...modelosPers])].sort();
+            }
+
+            atualizarMarcas() {
                 const tipoSelect = document.getElementById('tipo');
                 const marcaSelect = document.getElementById('marca');
                 const modeloSelect = document.getElementById('modelo');
-                const marcaManual = document.getElementById('marcaManual');
-                const modeloManual = document.getElementById('modeloManual');
-                const setorSelect = document.getElementById('setor');
-                const localSelect = document.getElementById('local');
-                const setorManual = document.getElementById('setorManual');
-                const localManual = document.getElementById('localManual');
                 
-                // Determinar valores finais
-                let marca = marcaSelect.value === 'OUTRO' || !marcaSelect.value ? 
-                           marcaManual.value.trim() : marcaSelect.value.trim();
-                           
-                let modelo = modeloSelect.value === 'OUTRO' ? 
-                            modeloManual.value.trim() : 
-                            (modeloManual.value.trim() || modeloSelect.value.trim());
+                if (!tipoSelect || !marcaSelect) return;
                 
-                let setor = setorSelect.value === 'OUTRO' || !setorSelect.value ?
-                           setorManual.value.trim() : setorSelect.value.trim();
-                           
-                let local = localSelect.value === 'OUTRO' || !localSelect.value ?
-                           localManual.value.trim() : localSelect.value.trim();
+                const tipoEquip = tipoSelect.value;
                 
-                const item = {
-                    type: tipoSelect.value.trim(),
-                    brand: marca,
-                    model: modelo,
-                    serialNumber: document.getElementById('numeroSerie').value.trim(),
-                    patSiads: document.getElementById('patrimonioSiads').value.trim(),
-                    patEbserh: document.getElementById('patrimonioEbserh').value.trim(),
-                    patFub: document.getElementById('patrimonioFub').value.trim(),
-                    building: document.getElementById('predio').value.trim(),
-                    floor: document.getElementById('andar').value.trim(),
-                    setor: setor.toUpperCase(),
-                    local: local.toUpperCase(),
-                    sector: `${setor.toUpperCase()} - ${local.toUpperCase()}`, // Manter compatibilidade
-                    vinculo: document.getElementById('vinculo').value.trim(),
-                    observation: document.getElementById('observacao').value.trim()
-                };
+                // Reset
+                marcaSelect.innerHTML = '<option value="">Selecione...</option>';
+                if (modeloSelect) {
+                    modeloSelect.innerHTML = '<option value="">Selecione a marca primeiro...</option>';
+                }
+                
+                const containerMarcaManual = document.getElementById('marcaManualContainer');
+                const containerModeloManual = document.getElementById('modeloManualContainer');
+                if (containerMarcaManual) containerMarcaManual.classList.remove('visivel');
+                if (containerModeloManual) containerModeloManual.classList.remove('visivel');
+                
+                if (!tipoEquip) return;
+                
+                const marcas = this.obterMarcas(tipoEquip);
+                
+                marcas.forEach(marca => {
+                    const option = document.createElement('option');
+                    option.value = marca;
+                    option.textContent = marca;
+                    marcaSelect.appendChild(option);
+                });
+                
+                // Adicionar opção "Outro..."
+                const optOutro = document.createElement('option');
+                optOutro.value = 'OUTRO';
+                optOutro.textContent = '➕ Outro...';
+                optOutro.style.fontWeight = 'bold';
+                optOutro.style.color = '#6366f1';
+                marcaSelect.appendChild(optOutro);
+            }
 
-                // Validações
-                if (!item.type || !item.brand || !item.building || !item.floor || !item.setor || !item.local) {
-                    this.mostrarMensagem('Preencha todos os campos obrigatórios', 'erro');
+            atualizarModelos() {
+                const tipoSelect = document.getElementById('tipo');
+                const marcaSelect = document.getElementById('marca');
+                const modeloSelect = document.getElementById('modelo');
+                
+                if (!tipoSelect || !marcaSelect || !modeloSelect) return;
+                
+                const tipoEquip = tipoSelect.value;
+                const marca = marcaSelect.value;
+                
+                modeloSelect.innerHTML = '<option value="">Selecione...</option>';
+                
+                const containerModeloManual = document.getElementById('modeloManualContainer');
+                if (containerModeloManual) containerModeloManual.classList.remove('visivel');
+                
+                if (marca === 'OUTRO') {
+                    this.tratarSelecaoOutro('marca');
                     return;
                 }
+                
+                if (!tipoEquip || !marca) return;
+                
+                const modelos = this.obterModelos(tipoEquip, marca);
+                
+                modelos.forEach(modelo => {
+                    const option = document.createElement('option');
+                    option.value = modelo;
+                    option.textContent = modelo;
+                    modeloSelect.appendChild(option);
+                });
+                
+                // Adicionar opção "Outro..."
+                const optOutro = document.createElement('option');
+                optOutro.value = 'OUTRO';
+                optOutro.textContent = '➕ Outro...';
+                optOutro.style.fontWeight = 'bold';
+                optOutro.style.color = '#6366f1';
+                modeloSelect.appendChild(optOutro);
+            }
 
-                const patrimonios = [item.serialNumber, item.patSiads, item.patEbserh, item.patFub];
-                if (!patrimonios.some(p => p !== '')) {
-                    this.mostrarMensagem('Informe pelo menos um número de patrimônio', 'erro');
-                    return;
-                }
-
-                // Adicionar dados personalizados e histórico
-                if (marca && marca !== 'OUTRO') {
-                    this.adicionarDadoPersonalizado(item.type, marca, modelo);
+            // ===========================================================================
+            // CAMPOS DINÂMICOS - HISTÓRICO (SETOR/LOCAL)
+            // ===========================================================================
+            
+            atualizarSelectHistorico(campoId, historicoKey) {
+                const select = document.getElementById(campoId);
+                if (!select) return;
+                
+                const historicoDados = this.historico[this.tipoAtual]?.[historicoKey] || {};
+                const ordenados = Object.entries(historicoDados)
+                    .sort((a, b) => b[1] - a[1]);
+                
+                select.innerHTML = '<option value="">Digite ou selecione...</option>';
+                
+                if (ordenados.length > 0) {
+                    // Top 5
+                    ordenados.slice(0, 5).forEach(([valor, freq]) => {
+                        const option = document.createElement('option');
+                        option.value = valor;
+                        option.textContent = valor;
+                        select.appendChild(option);
+                    });
+                    
+                    // Resto
+                    if (ordenados.length > 5) {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = '──────────';
+                        select.appendChild(optgroup);
+                        
+                        ordenados.slice(5).forEach(([valor]) => {
+                            const option = document.createElement('option');
+                            option.value = valor;
+                            option.textContent = valor;
+                            select.appendChild(option);
+                        });
+                    }
                 }
                 
-                // Adicionar ao histórico de setores e locais
-                this.adicionarHistorico('setor', item.setor);
-                this.adicionarHistorico('local', item.local);
+                // Opção "Outro..."
+                const optOutro = document.createElement('option');
+                optOutro.value = 'OUTRO';
+                optOutro.textContent = '➕ Outro...';
+                optOutro.style.fontWeight = 'bold';
+                optOutro.style.color = '#6366f1';
+                select.appendChild(optOutro);
+            }
+
+            adicionarHistorico(historicoKey, valor) {
+                if (!valor || !this.tipoAtual) return;
+                
+                valor = valor.toUpperCase().trim();
+                
+                if (!this.historico[this.tipoAtual]) {
+                    this.historico[this.tipoAtual] = { setores: {}, locais: {} };
+                }
+                
+                if (!this.historico[this.tipoAtual][historicoKey]) {
+                    this.historico[this.tipoAtual][historicoKey] = {};
+                }
+                
+                this.historico[this.tipoAtual][historicoKey][valor] = 
+                    (this.historico[this.tipoAtual][historicoKey][valor] || 0) + 1;
+                
+                this.salvarHistorico();
+            }
+
+            // ===========================================================================
+            // TRATAMENTO DE "OUTRO..."
+            // ===========================================================================
+            
+            tratarSelecaoOutro(campoId) {
+                const select = document.getElementById(campoId);
+                const container = document.getElementById(`${campoId}ManualContainer`);
+                const manual = document.getElementById(`${campoId}Manual`);
+                
+                if (!select || !container) return;
+                
+                if (select.value === 'OUTRO') {
+                    container.classList.add('visivel');
+                    if (manual) {
+                        manual.focus();
+                    }
+                } else {
+                    container.classList.remove('visivel');
+                    if (manual) manual.value = '';
+                }
+            }
+
+            // ===========================================================================
+            // CRUD DE ITENS
+            // ===========================================================================
+            
+            salvarItem(evento) {
+                evento.preventDefault();
+                
+                const tipo = this.tiposFormulario[this.tipoAtual];
+                const item = {};
+                
+                // Coletar valores dos campos
+                tipo.campos.forEach(campo => {
+                    const select = document.getElementById(campo.id);
+                    const manual = document.getElementById(`${campo.id}Manual`);
+                    
+                    let valor = '';
+                    
+                    if (select) {
+                        if ((campo.tipo === 'select-dinamico' || campo.tipo === 'select-historico') 
+                            && campo.permitirOutro && select.value === 'OUTRO') {
+                            valor = manual?.value?.trim() || '';
+                        } else {
+                            valor = select.value?.trim() || '';
+                        }
+                    }
+                    
+                    // Normalizar para maiúsculas
+                    if (typeof valor === 'string' && campo.tipo !== 'number') {
+                        valor = valor.toUpperCase();
+                    }
+                    
+                    item[campo.id] = valor;
+                });
+
+                // Validações obrigatórias
+                for (let campo of tipo.campos) {
+                    if (campo.obrigatorio && !item[campo.id]) {
+                        this.mostrarMensagem(`Preencha o campo ${campo.label}`, 'erro');
+                        return;
+                    }
+                }
+
+                // Validação customizada do tipo
+                if (tipo.validarItem) {
+                    const resultado = tipo.validarItem(item);
+                    if (!resultado.valido) {
+                        this.mostrarMensagem(resultado.erro, 'erro');
+                        return;
+                    }
+                }
+
+                // Adicionar dados personalizados (marca/modelo)
+                if (item.tipo && item.marca) {
+                    this.adicionarDadoPersonalizado(item.tipo, item.marca, item.modelo);
+                }
+                
+                // Adicionar ao histórico
+                if (item.setor) this.adicionarHistorico('setores', item.setor);
+                if (item.local) this.adicionarHistorico('locais', item.local);
 
                 // Salvar
                 if (this.indiceEdicao === -1) {
@@ -1560,112 +1824,130 @@
                     document.getElementById('btnSalvarItem').innerHTML = '➕ Adicionar Item';
                 }
 
-                this.colecoes[this.colecaoAtual] = this.dadosAtuais;
+                this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
                 this.salvarDados();
                 
-                // Atualizar listas de setor e local
-                this.atualizarListaSetores();
-                this.atualizarListaLocais();
+                // Atualizar listas
+                this.atualizarSelectHistorico('setor', 'setores');
+                this.atualizarSelectHistorico('local', 'locais');
                 
-                document.getElementById('formularioCadastro').reset();
+                this.limparFormulario();
                 document.getElementById('contadorItens').textContent = this.dadosAtuais.length;
+                this.renderizarHub();
+            }
+
+            adicionarDadoPersonalizado(tipoEquip, marca, modelo) {
+                if (!tipoEquip || !marca) return;
                 
-                // Limpar campos dinâmicos
-                document.getElementById('marcaManualContainer').classList.remove('visivel');
-                document.getElementById('modeloManualContainer').classList.remove('visivel');
-                document.getElementById('setorManualContainer').classList.remove('visivel');
-                document.getElementById('localManualContainer').classList.remove('visivel');
-                document.getElementById('marca').setAttribute('required', '');
-                document.getElementById('marcaManual').removeAttribute('required');
-                document.getElementById('setor').setAttribute('required', '');
-                document.getElementById('setorManual').removeAttribute('required');
-                document.getElementById('local').setAttribute('required', '');
-                document.getElementById('localManual').removeAttribute('required');
+                marca = marca.toUpperCase();
+                
+                if (!this.dadosPersonalizados[this.tipoAtual]) {
+                    this.dadosPersonalizados[this.tipoAtual] = {};
+                }
+                
+                if (!this.dadosPersonalizados[this.tipoAtual][tipoEquip]) {
+                    this.dadosPersonalizados[this.tipoAtual][tipoEquip] = {};
+                }
+                
+                if (!this.dadosPersonalizados[this.tipoAtual][tipoEquip][marca]) {
+                    this.dadosPersonalizados[this.tipoAtual][tipoEquip][marca] = [];
+                }
+                
+                if (modelo && !this.dadosPersonalizados[this.tipoAtual][tipoEquip][marca].includes(modelo)) {
+                    this.dadosPersonalizados[this.tipoAtual][tipoEquip][marca].push(modelo);
+                    this.salvarDadosPersonalizados();
+                }
             }
 
             editarItem(indice) {
                 const item = this.dadosAtuais[indice];
-                
-                // Preencher tipo primeiro
-                document.getElementById('tipo').value = item.type || '';
-                
-                // Disparar evento de mudança para atualizar marcas
-                document.getElementById('tipo').dispatchEvent(new Event('change'));
-                
-                // Aguardar um momento para o DOM atualizar
-                setTimeout(() => {
-                    const marcaSelect = document.getElementById('marca');
-                    const modeloSelect = document.getElementById('modelo');
-                    
-                    // Verificar se a marca existe nas opções
-                    const marcaExiste = Array.from(marcaSelect.options).some(opt => opt.value === item.brand);
-                    
-                    if (marcaExiste) {
-                        marcaSelect.value = item.brand;
-                    } else if (item.brand) {
-                        // Marca personalizada
-                        marcaSelect.value = 'OUTRO';
-                        document.getElementById('marcaManualContainer').classList.add('visivel');
-                        document.getElementById('marcaManual').value = item.brand;
-                    }
-                    
-                    // Disparar evento de mudança para atualizar modelos
-                    marcaSelect.dispatchEvent(new Event('change'));
-                    
-                    setTimeout(() => {
-                        // Verificar se o modelo existe nas opções
-                        const modeloExiste = Array.from(modeloSelect.options).some(opt => opt.value === item.model);
-                        
-                        if (modeloExiste) {
-                            modeloSelect.value = item.model;
-                        } else if (item.model) {
-                            // Modelo personalizado
-                            modeloSelect.value = 'OUTRO';
-                            document.getElementById('modeloManualContainer').classList.add('visivel');
-                            document.getElementById('modeloManual').value = item.model;
-                        }
-                    }, 50);
-                }, 50);
-                
-                // Preencher outros campos
-                document.getElementById('numeroSerie').value = item.serialNumber || '';
-                document.getElementById('patrimonioSiads').value = item.patSiads || '';
-                document.getElementById('patrimonioEbserh').value = item.patEbserh || '';
-                document.getElementById('patrimonioFub').value = item.patFub || '';
-                document.getElementById('predio').value = item.building || '';
-                document.getElementById('andar').value = item.floor || '';
-                
-                // Preencher setor
-                const setorSelect = document.getElementById('setor');
-                const setorExiste = Array.from(setorSelect.options).some(opt => opt.value === item.setor);
-                
-                if (setorExiste) {
-                    setorSelect.value = item.setor || '';
-                } else if (item.setor) {
-                    setorSelect.value = 'OUTRO';
-                    document.getElementById('setorManualContainer').classList.add('visivel');
-                    document.getElementById('setorManual').value = item.setor || '';
-                }
-                
-                // Preencher local
-                const localSelect = document.getElementById('local');
-                const localExiste = Array.from(localSelect.options).some(opt => opt.value === item.local);
-                
-                if (localExiste) {
-                    localSelect.value = item.local || '';
-                } else if (item.local) {
-                    localSelect.value = 'OUTRO';
-                    document.getElementById('localManualContainer').classList.add('visivel');
-                    document.getElementById('localManual').value = item.local || '';
-                }
-                
-                document.getElementById('vinculo').value = item.vinculo || '';
-                document.getElementById('observacao').value = item.observation || '';
+                const tipoConfig = this.tiposFormulario[this.tipoAtual];
                 
                 this.indiceEdicao = indice;
                 document.getElementById('btnSalvarItem').innerHTML = '✏️ Atualizar Item';
                 this.mostrarAba('formulario');
+                
+                // Preencher campos em sequência com Promises para garantir ordem
+                this.preencherCamposEdicao(item, tipoConfig);
                 this.mostrarMensagem('Editando item...');
+            }
+
+            async preencherCamposEdicao(item, tipoConfig) {
+                // 1. Preencher campo TIPO primeiro (dispara atualização de marcas)
+                const tipoEl = document.getElementById('tipo');
+                if (tipoEl && item.tipo) {
+                    tipoEl.value = item.tipo;
+                    this.atualizarMarcas();
+                }
+                
+                // Aguardar DOM atualizar
+                await this.aguardar(100);
+                
+                // 2. Preencher MARCA (dispara atualização de modelos)
+                const marcaEl = document.getElementById('marca');
+                if (marcaEl && item.marca) {
+                    const marcaExiste = Array.from(marcaEl.options).some(opt => opt.value === item.marca);
+                    
+                    if (marcaExiste) {
+                        marcaEl.value = item.marca;
+                    } else {
+                        marcaEl.value = 'OUTRO';
+                        const manual = document.getElementById('marcaManual');
+                        const container = document.getElementById('marcaManualContainer');
+                        if (manual) manual.value = item.marca;
+                        if (container) container.classList.add('visivel');
+                    }
+                    this.atualizarModelos();
+                }
+                
+                // Aguardar DOM atualizar
+                await this.aguardar(100);
+                
+                // 3. Preencher MODELO
+                const modeloEl = document.getElementById('modelo');
+                if (modeloEl && item.modelo) {
+                    const modeloExiste = Array.from(modeloEl.options).some(opt => opt.value === item.modelo);
+                    
+                    if (modeloExiste) {
+                        modeloEl.value = item.modelo;
+                    } else {
+                        modeloEl.value = 'OUTRO';
+                        const manual = document.getElementById('modeloManual');
+                        const container = document.getElementById('modeloManualContainer');
+                        if (manual) manual.value = item.modelo;
+                        if (container) container.classList.add('visivel');
+                    }
+                }
+                
+                // 4. Preencher demais campos (não dinâmicos)
+                tipoConfig.campos.forEach(campo => {
+                    // Pular campos já preenchidos
+                    if (['tipo', 'marca', 'modelo'].includes(campo.id)) return;
+                    
+                    const elemento = document.getElementById(campo.id);
+                    if (!elemento) return;
+                    
+                    const valor = item[campo.id] || '';
+                    
+                    if (campo.tipo === 'select-historico') {
+                        const existe = Array.from(elemento.options).some(opt => opt.value === valor);
+                        if (existe && valor) {
+                            elemento.value = valor;
+                        } else if (valor) {
+                            elemento.value = 'OUTRO';
+                            const manual = document.getElementById(`${campo.id}Manual`);
+                            const container = document.getElementById(`${campo.id}ManualContainer`);
+                            if (manual) manual.value = valor;
+                            if (container) container.classList.add('visivel');
+                        }
+                    } else {
+                        elemento.value = valor;
+                    }
+                });
+            }
+
+            aguardar(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
             }
 
             async excluirItem(indice) {
@@ -1676,9 +1958,10 @@
                 
                 if (confirmar) {
                     this.dadosAtuais.splice(indice, 1);
-                    this.colecoes[this.colecaoAtual] = this.dadosAtuais;
+                    this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
                     this.salvarDados();
                     this.renderizarTabela();
+                    this.renderizarHub();
                     document.getElementById('contadorItens').textContent = this.dadosAtuais.length;
                     this.mostrarMensagem('Item excluído');
                 }
@@ -1692,74 +1975,89 @@
                 
                 if (confirmar) {
                     this.dadosAtuais = [];
-                    this.colecoes[this.colecaoAtual] = this.dadosAtuais;
+                    this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
                     this.salvarDados();
                     this.renderizarTabela();
+                    this.renderizarHub();
                     document.getElementById('contadorItens').textContent = 0;
                     this.mostrarMensagem('Todos os itens foram removidos', 'erro');
                 }
             }
 
+            limparFormulario() {
+                document.getElementById('formularioCadastro').reset();
+                
+                // Ocultar todos os containers manuais
+                document.querySelectorAll('.input-manual').forEach(el => {
+                    el.classList.remove('visivel');
+                });
+                
+                this.indiceEdicao = -1;
+                document.getElementById('btnSalvarItem').innerHTML = '➕ Adicionar Item';
+            }
+
+            // ===========================================================================
+            // TABELA
+            // ===========================================================================
+            
+            renderizarCabecalhoTabela() {
+                const tipo = this.tiposFormulario[this.tipoAtual];
+                const thead = document.getElementById('cabecalhoTabela');
+                
+                let html = '<tr>';
+                tipo.colunas.forEach(col => {
+                    html += `<th>${col.label}</th>`;
+                });
+                html += '<th class="text-center">Ações</th></tr>';
+                
+                thead.innerHTML = html;
+            }
+
             renderizarTabela() {
+                const tipo = this.tiposFormulario[this.tipoAtual];
                 const corpo = document.getElementById('corpoTabela');
                 corpo.innerHTML = '';
                 
                 if (this.dadosAtuais.length === 0) {
-                    corpo.innerHTML = '<tr><td colspan="14" class="text-center">Nenhum item registrado</td></tr>';
+                    corpo.innerHTML = `<tr><td colspan="${tipo.colunas.length + 1}" class="text-center">Nenhum item registrado</td></tr>`;
                     return;
                 }
                 
                 this.dadosAtuais.forEach((item, indice) => {
                     const linha = corpo.insertRow();
-                    linha.innerHTML = `
-                        <td>${this.escaparHTML(item.type || '')}</td>
-                        <td>${this.escaparHTML(item.brand || '')}</td>
-                        <td>${this.escaparHTML(item.model || '')}</td>
-                        <td>${this.escaparHTML(item.serialNumber || '')}</td>
-                        <td>${this.escaparHTML(item.patSiads || '')}</td>
-                        <td>${this.escaparHTML(item.patEbserh || '')}</td>
-                        <td>${this.escaparHTML(item.patFub || '')}</td>
-                        <td>${this.escaparHTML(item.building || '')}</td>
-                        <td>${this.escaparHTML(item.floor || '')}</td>
-                        <td>${this.escaparHTML(item.setor || '')}</td>
-                        <td>${this.escaparHTML(item.local || '')}</td>
-                        <td>${this.escaparHTML(item.vinculo || '')}</td>
-                        <td>${this.escaparHTML(item.observation || '')}</td>
-                        <td class="text-center">
-                            <button onclick="sistema.editarItem(${indice})" class="btn-secondary btn-sm">Editar</button>
-                            <button onclick="sistema.excluirItem(${indice})" class="btn-danger btn-sm">Excluir</button>
-                        </td>
+                    
+                    tipo.colunas.forEach(col => {
+                        const celula = linha.insertCell();
+                        celula.textContent = item[col.id] || '';
+                    });
+                    
+                    const celulaAcoes = linha.insertCell();
+                    celulaAcoes.className = 'text-center';
+                    celulaAcoes.innerHTML = `
+                        <button onclick="sistema.editarItem(${indice})" class="btn-secondary btn-sm">Editar</button>
+                        <button onclick="sistema.excluirItem(${indice})" class="btn-danger btn-sm">Excluir</button>
                     `;
                 });
             }
 
-            // Exportação
+            // ===========================================================================
+            // EXPORTAÇÃO
+            // ===========================================================================
+            
             exportarColecao(nomeColecao) {
-                const dados = this.colecoes[nomeColecao || this.colecaoAtual] || [];
+                const dados = this.colecoes[this.tipoAtual][nomeColecao || this.colecaoAtual] || [];
+                const tipo = this.tiposFormulario[this.tipoAtual];
                 
                 if (dados.length === 0) {
                     this.mostrarMensagem('Nenhum dado para exportar', 'erro');
                     return;
                 }
                 
-                const cabecalhos = [
-                    "TIPO", "MARCA", "MODELO", "NÚMERO DE SÉRIE",
-                    "PAT. SIADS", "PAT. EBSERH", "PAT. FUB",
-                    "PRÉDIO", "ANDAR", "SETOR", "LOCAL", "VÍNCULO", "OBSERVAÇÃO"
-                ];
-                
+                const cabecalhos = tipo.colunas.map(c => c.label);
                 let csv = '\uFEFF' + cabecalhos.join(';') + '\n';
                 
                 dados.forEach(item => {
-                    const linha = [
-                        item.type, item.brand, item.model, item.serialNumber,
-                        item.patSiads, item.patEbserh, item.patFub,
-                        item.building, item.floor, 
-                        item.setor || (item.sector ? item.sector.split('-')[0]?.trim() : ''),
-                        item.local || (item.sector ? item.sector.split('-')[1]?.trim() : ''),
-                        item.vinculo || item.user || '',
-                        item.observation
-                    ].map(v => this.escaparCSV(v)).join(';');
+                    const linha = tipo.colunas.map(col => this.escaparCSV(item[col.id])).join(';');
                     csv += linha + '\n';
                 });
                 
@@ -1768,151 +2066,71 @@
                 this.mostrarMensagem('Dados prontos para exportação');
             }
 
-            // Exportação direta para download
             exportarDiretoCSV(nomeColecao) {
-                const dados = this.colecoes[nomeColecao] || [];
+                const dados = this.colecoes[this.tipoAtual][nomeColecao] || [];
+                const tipo = this.tiposFormulario[this.tipoAtual];
                 
                 if (dados.length === 0) {
                     this.mostrarMensagem('Esta coleta não possui itens para exportar', 'erro');
                     return;
                 }
                 
-                const cabecalhos = [
-                    "TIPO", "MARCA", "MODELO", "NÚMERO DE SÉRIE",
-                    "PAT. SIADS", "PAT. EBSERH", "PAT. FUB",
-                    "PRÉDIO", "ANDAR", "SETOR", "LOCAL", "VÍNCULO", "OBSERVAÇÃO"
-                ];
-                
+                const cabecalhos = tipo.colunas.map(c => c.label);
                 let csv = '\uFEFF' + cabecalhos.join(';') + '\n';
                 
                 dados.forEach(item => {
-                    const linha = [
-                        item.type, item.brand, item.model, item.serialNumber,
-                        item.patSiads, item.patEbserh, item.patFub,
-                        item.building, item.floor, 
-                        item.setor || (item.sector ? item.sector.split('-')[0]?.trim() : ''),
-                        item.local || (item.sector ? item.sector.split('-')[1]?.trim() : ''),
-                        item.vinculo || item.user || '',
-                        item.observation
-                    ].map(v => this.escaparCSV(v)).join(';');
+                    const linha = tipo.colunas.map(col => this.escaparCSV(item[col.id])).join(';');
                     csv += linha + '\n';
                 });
                 
-                // Baixar direto
-                const nomeArquivo = `coleta_${nomeColecao}_${new Date().toISOString().split('T')[0]}.csv`;
+                const nomeArquivo = `${this.tipoAtual}_${nomeColecao}_${new Date().toISOString().split('T')[0]}.csv`;
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = nomeArquivo;
                 link.click();
                 
-                // Feedback visual com animação
-                this.mostrarMensagemTemporaria(`✅ CSV "${nomeColecao}" baixado com sucesso!`, 'sucesso');
+                this.mostrarMensagemFlutuante(`✅ CSV "${nomeColecao}" baixado com sucesso!`, 'sucesso');
             }
 
-            // Visualização rápida da coleta
             async visualizarColecao(nomeColecao) {
-                const dados = this.colecoes[nomeColecao] || [];
+                const dados = this.colecoes[this.tipoAtual][nomeColecao] || [];
+                const tipo = this.tiposFormulario[this.tipoAtual];
                 
                 if (dados.length === 0) {
                     this.mostrarMensagem('Esta coleta não possui itens', 'erro');
                     return;
                 }
                 
-                // Criar resumo da coleta
-                const resumo = {
-                    total: dados.length,
-                    porTipo: {},
-                    porPredio: {},
-                    porSetor: {}
-                };
+                const resumo = { total: dados.length, porCampo: {} };
                 
-                dados.forEach(item => {
-                    // Contar por tipo
-                    resumo.porTipo[item.type] = (resumo.porTipo[item.type] || 0) + 1;
-                    // Contar por prédio
-                    resumo.porPredio[item.building] = (resumo.porPredio[item.building] || 0) + 1;
-                    // Contar por setor
-                    const setor = item.setor || 'NÃO INFORMADO';
-                    resumo.porSetor[setor] = (resumo.porSetor[setor] || 0) + 1;
+                // Analisar campos relevantes
+                ['tipo', 'predio', 'setor'].forEach(campoId => {
+                    if (tipo.colunas.some(c => c.id === campoId)) {
+                        resumo.porCampo[campoId] = {};
+                        dados.forEach(item => {
+                            const valor = item[campoId] || 'NÃO INFORMADO';
+                            resumo.porCampo[campoId][valor] = (resumo.porCampo[campoId][valor] || 0) + 1;
+                        });
+                    }
                 });
                 
-                // Montar mensagem do resumo
                 let mensagemResumo = `📊 RESUMO DA COLETA "${nomeColecao}"\n\n`;
                 mensagemResumo += `Total de itens: ${resumo.total}\n\n`;
                 
-                mensagemResumo += `Por Tipo:\n`;
-                Object.entries(resumo.porTipo).forEach(([tipo, qtd]) => {
-                    mensagemResumo += `  • ${tipo}: ${qtd}\n`;
-                });
-                
-                mensagemResumo += `\nPor Prédio:\n`;
-                Object.entries(resumo.porPredio).forEach(([predio, qtd]) => {
-                    mensagemResumo += `  • ${predio}: ${qtd}\n`;
-                });
-                
-                mensagemResumo += `\nPor Setor (Top 5):\n`;
-                Object.entries(resumo.porSetor)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 5)
-                    .forEach(([setor, qtd]) => {
-                        mensagemResumo += `  • ${setor}: ${qtd}\n`;
-                    });
-                
-                // Usar o modal existente para mostrar o resumo
-                await this.abrirModalVisualizacao('Visualização da Coleta', mensagemResumo);
-            }
-
-            // Mensagem temporária com animação
-            mostrarMensagemTemporaria(texto, tipo = 'sucesso') {
-                // Criar elemento de mensagem flutuante
-                const msgElement = document.createElement('div');
-                msgElement.className = `mensagem ${tipo} visivel`;
-                msgElement.textContent = texto;
-                msgElement.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    z-index: 9999;
-                    animation: slideIn 0.3s ease-out;
-                `;
-                
-                // Adicionar animação CSS se não existir
-                if (!document.querySelector('#animacoes-custom')) {
-                    const style = document.createElement('style');
-                    style.id = 'animacoes-custom';
-                    style.textContent = `
-                        @keyframes slideIn {
-                            from {
-                                transform: translateX(100%);
-                                opacity: 0;
-                            }
-                            to {
-                                transform: translateX(0);
-                                opacity: 1;
-                            }
-                        }
-                        @keyframes slideOut {
-                            from {
-                                transform: translateX(0);
-                                opacity: 1;
-                            }
-                            to {
-                                transform: translateX(100%);
-                                opacity: 0;
-                            }
-                        }
-                    `;
-                    document.head.appendChild(style);
+                for (let campo in resumo.porCampo) {
+                    const coluna = tipo.colunas.find(c => c.id === campo);
+                    mensagemResumo += `Por ${coluna?.label || campo}:\n`;
+                    Object.entries(resumo.porCampo[campo])
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 5)
+                        .forEach(([valor, qtd]) => {
+                            mensagemResumo += `  • ${valor}: ${qtd}\n`;
+                        });
+                    mensagemResumo += '\n';
                 }
                 
-                document.body.appendChild(msgElement);
-                
-                // Remover após 3 segundos com animação
-                setTimeout(() => {
-                    msgElement.style.animation = 'slideOut 0.3s ease-out';
-                    setTimeout(() => msgElement.remove(), 300);
-                }, 3000);
+                await this.abrirModalVisualizacao('Visualização da Coleta', mensagemResumo);
             }
 
             copiarCSV() {
@@ -1924,7 +2142,7 @@
 
             baixarCSV() {
                 const csv = document.getElementById('textoCSV').value;
-                const nome = `coleta_${this.colecaoAtual}_${new Date().toISOString().split('T')[0]}.csv`;
+                const nome = `${this.tipoAtual}_${this.colecaoAtual}_${new Date().toISOString().split('T')[0]}.csv`;
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
@@ -1933,8 +2151,12 @@
                 this.mostrarMensagem('Arquivo baixado!');
             }
 
-            // Utilitários
+            // ===========================================================================
+            // UTILITÁRIOS
+            // ===========================================================================
+            
             escaparHTML(str) {
+                if (!str) return '';
                 const div = document.createElement('div');
                 div.textContent = str;
                 return div.innerHTML;
@@ -1949,7 +2171,29 @@
                 return str;
             }
 
-            // Modal
+            mostrarMensagem(texto, tipo = 'sucesso') {
+                const mensagem = document.getElementById('mensagem');
+                mensagem.textContent = texto;
+                mensagem.className = `mensagem ${tipo} visivel`;
+                setTimeout(() => mensagem.classList.remove('visivel'), 3000);
+            }
+
+            mostrarMensagemFlutuante(texto, tipo = 'sucesso') {
+                const msgElement = document.createElement('div');
+                msgElement.className = `mensagem ${tipo} visivel msg-flutuante`;
+                msgElement.textContent = texto;
+                document.body.appendChild(msgElement);
+                
+                setTimeout(() => {
+                    msgElement.style.animation = 'slideOut 0.3s ease-out';
+                    setTimeout(() => msgElement.remove(), 300);
+                }, 3000);
+            }
+
+            // ===========================================================================
+            // MODAIS
+            // ===========================================================================
+            
             abrirModalInput(titulo, mensagem) {
                 return new Promise((resolver) => {
                     const modal = document.getElementById('modal');
@@ -1961,19 +2205,17 @@
                     input.value = '';
                     
                     modal.classList.add('ativo');
+                    input.focus();
                     
-                    const confirmar = () => {
+                    document.getElementById('modalBtnConfirmar').onclick = () => {
                         modal.classList.remove('ativo');
                         resolver(input.value.trim());
                     };
                     
-                    const cancelar = () => {
+                    document.getElementById('modalBtnCancelar').onclick = () => {
                         modal.classList.remove('ativo');
                         resolver(null);
                     };
-                    
-                    document.getElementById('modalBtnConfirmar').onclick = confirmar;
-                    document.getElementById('modalBtnCancelar').onclick = cancelar;
                 });
             }
 
@@ -2011,7 +2253,6 @@
                     modalMsg.style.overflowY = 'auto';
                     document.getElementById('modalInput').style.display = 'none';
                     
-                    // Esconder botão cancelar e mudar texto do confirmar
                     document.getElementById('modalBtnCancelar').style.display = 'none';
                     document.getElementById('modalBtnConfirmar').textContent = 'Fechar';
                     
@@ -2019,33 +2260,62 @@
                     
                     document.getElementById('modalBtnConfirmar').onclick = () => {
                         modal.classList.remove('ativo');
-                        // Restaurar botões
                         document.getElementById('modalBtnCancelar').style.display = '';
                         document.getElementById('modalBtnConfirmar').textContent = 'Confirmar';
-                        modalMsg.style.whiteSpace = '';
-                        modalMsg.style.textAlign = '';
-                        modalMsg.style.fontSize = '';
-                        modalMsg.style.maxHeight = '';
-                        modalMsg.style.overflowY = '';
+                        modalMsg.style = '';
                         resolver(true);
                     };
                 });
             }
 
-            // Eventos
-            configurarEventos() {
+            // ===========================================================================
+            // PWA
+            // ===========================================================================
+            
+            configurarPWA() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(() => console.log('Service Worker registrado'))
+                        .catch(err => console.log('Erro no SW:', err));
+                }
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.promptInstalacao = e;
+                    document.getElementById('promptInstalacao').classList.add('visivel');
+                });
+
+                const atualizarStatus = () => {
+                    const statusEl = document.getElementById('statusPWA');
+                    const textoEl = document.getElementById('textoStatus');
+                    
+                    if (navigator.onLine) {
+                        textoEl.textContent = '🟢 Online';
+                        statusEl.className = 'status-pwa online';
+                    } else {
+                        textoEl.textContent = '🔴 Offline';
+                        statusEl.className = 'status-pwa offline';
+                    }
+                    
+                    statusEl.style.display = 'block';
+                    setTimeout(() => statusEl.style.display = 'none', 3000);
+                };
+
+                window.addEventListener('online', atualizarStatus);
+                window.addEventListener('offline', atualizarStatus);
+            }
+
+            // ===========================================================================
+            // EVENTOS GLOBAIS
+            // ===========================================================================
+            
+            configurarEventosGlobais() {
                 // Navegação
                 document.getElementById('btnNovaColeta').addEventListener('click', () => this.criarColecao());
-                document.getElementById('btnListarColetas').addEventListener('click', () => {
-                    this.renderizarListaColecoes();
-                    this.mostrarTela('telaListaColetas');
-                });
-                document.getElementById('btnVoltarPrincipal').addEventListener('click', () => this.mostrarTela('telaPrincipal'));
-                document.getElementById('btnInicio').addEventListener('click', () => this.mostrarTela('telaPrincipal'));
-                document.getElementById('btnTodasColetas').addEventListener('click', () => {
-                    this.renderizarListaColecoes();
-                    this.mostrarTela('telaListaColetas');
-                });
+                document.getElementById('btnListarColetas').addEventListener('click', () => this.irParaListaColetas());
+                document.getElementById('btnVoltarPrincipal').addEventListener('click', () => this.voltarPrincipal());
+                document.getElementById('btnInicio').addEventListener('click', () => this.irParaHub());
+                document.getElementById('btnTodasColetas').addEventListener('click', () => this.irParaListaColetas());
 
                 // Abas
                 document.getElementById('abaFormulario').addEventListener('click', () => this.mostrarAba('formulario'));
@@ -2053,21 +2323,7 @@
 
                 // Formulário
                 document.getElementById('formularioCadastro').addEventListener('submit', (e) => this.salvarItem(e));
-                document.getElementById('btnLimparForm').addEventListener('click', () => {
-                    document.getElementById('formularioCadastro').reset();
-                    document.getElementById('marcaManualContainer').classList.remove('visivel');
-                    document.getElementById('modeloManualContainer').classList.remove('visivel');
-                    document.getElementById('setorManualContainer').classList.remove('visivel');
-                    document.getElementById('localManualContainer').classList.remove('visivel');
-                    document.getElementById('marca').setAttribute('required', '');
-                    document.getElementById('marcaManual').removeAttribute('required');
-                    document.getElementById('setor').setAttribute('required', '');
-                    document.getElementById('setorManual').removeAttribute('required');
-                    document.getElementById('local').setAttribute('required', '');
-                    document.getElementById('localManual').removeAttribute('required');
-                    this.indiceEdicao = -1;
-                    document.getElementById('btnSalvarItem').innerHTML = '➕ Adicionar Item';
-                });
+                document.getElementById('btnLimparForm').addEventListener('click', () => this.limparFormulario());
 
                 // Tabela
                 document.getElementById('btnExportarCSV').addEventListener('click', () => this.exportarColecao());
@@ -2098,9 +2354,8 @@
             }
         }
 
-        // Inicialização Global
+        // Inicialização
         const sistema = new SistemaColetas();
     </script>
 </body>
-
 </html>
