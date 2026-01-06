@@ -1409,6 +1409,12 @@
                         </button>
                     </div>
 
+                    <div style="margin-top: 1rem;">
+                        <label for="wizSituacao">SITUAÇÃO:</label>
+                        <textarea id="wizSituacao" rows="2" placeholder="Ex: Computador com defeito no teclado, aguardando manutenção..." style="font-size: 0.875rem;"></textarea>
+                        <div class="dica">Campo opcional para observações sobre o computador.</div>
+                    </div>
+
                     <div id="listaHostnamesAtual" class="hostnames-lista"></div>
 
                     <div class="dica" style="margin-top: 1rem;">
@@ -1446,6 +1452,7 @@
                                 <th>Área</th>
                                 <th>Impressora</th>
                                 <th>Hostname</th>
+                                <th>Situação</th>
                                 <th class="text-center">Ações</th>
                             </tr>
                         </thead>
@@ -1552,6 +1559,10 @@
                     <div class="full-width">
                         <label for="editHostname">HOSTNAME:</label>
                         <input type="text" id="editHostname" required placeholder="Ex: PC-UTI-001" style="text-transform: uppercase;">
+                    </div>
+                    <div class="full-width">
+                        <label for="editSituacao">SITUAÇÃO:</label>
+                        <textarea id="editSituacao" rows="2" placeholder="Observações sobre o computador (opcional)"></textarea>
                     </div>
                 </div>
                 <div class="modal-botoes" style="margin-top: 1.5rem;">
@@ -1785,7 +1796,8 @@
                             { id: 'andar', label: 'ANDAR' },
                             { id: 'area', label: 'ÁREA' },
                             { id: 'impressora', label: 'IMPRESSORA' },
-                            { id: 'hostname', label: 'HOSTNAME' }
+                            { id: 'hostname', label: 'HOSTNAME' },
+                            { id: 'situacao', label: 'SITUAÇÃO' }
                         ],
                         
                         // Não precisa de validarItem pois a lógica é diferente
@@ -2813,6 +2825,7 @@
                 document.getElementById('wizImpressoraManual').value = '';
                 document.getElementById('wizImpressoraManualContainer').classList.remove('visivel');
                 document.getElementById('wizHostname').value = '';
+                document.getElementById('wizSituacao').value = '';
                 document.getElementById('listaHostnamesAtual').innerHTML = '';
                 
                 this.atualizarContadorWizard();
@@ -3023,6 +3036,7 @@
             adicionarHostname() {
                 const input = document.getElementById('wizHostname');
                 const hostname = input.value.trim().toUpperCase();
+                const situacao = document.getElementById('wizSituacao').value.trim();
                 
                 if (!hostname) {
                     this.mostrarMensagemWizard('Digite o hostname', 'erro');
@@ -3035,7 +3049,7 @@
                 }
                 
                 // Verificar se hostname já existe nesta sessão
-                if (this.wizardState.hostnamesAtuais.includes(hostname)) {
+                if (this.wizardState.hostnamesAtuais.some(h => h.hostname === hostname)) {
                     this.mostrarMensagemWizard('Este hostname já foi adicionado', 'erro');
                     return;
                 }
@@ -3047,7 +3061,8 @@
                     andar: this.wizardState.localizacao.andar,
                     area: this.wizardState.ambiente.area,
                     impressora: this.wizardState.ambiente.impressora,
-                    hostname: hostname
+                    hostname: hostname,
+                    situacao: situacao
                 };
                 
                 // Salvar
@@ -3055,12 +3070,13 @@
                 this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
                 this.salvarDados();
                 
-                // Atualizar lista visual
-                this.wizardState.hostnamesAtuais.push(hostname);
+                // Atualizar lista visual (guardar hostname e situação)
+                this.wizardState.hostnamesAtuais.push({ hostname, situacao });
                 this.renderizarListaHostnamesAtuais();
                 
-                // Limpar e focar
+                // Limpar campos e focar
                 input.value = '';
+                document.getElementById('wizSituacao').value = '';
                 input.focus();
                 
                 this.atualizarContadorWizard();
@@ -3076,7 +3092,10 @@
                     return;
                 }
                 
-                this.wizardState.hostnamesAtuais.forEach((hostname, idx) => {
+                this.wizardState.hostnamesAtuais.forEach((itemHost, idx) => {
+                    const hostname = typeof itemHost === 'string' ? itemHost : itemHost.hostname;
+                    const situacao = typeof itemHost === 'string' ? '' : (itemHost.situacao || '');
+                    
                     // Encontrar o índice real no dadosAtuais
                     const indiceReal = this.dadosAtuais.findIndex(item => 
                         item.hostname === hostname &&
@@ -3087,19 +3106,31 @@
                     
                     const item = document.createElement('div');
                     item.className = 'hostname-item';
+                    item.style.flexDirection = 'column';
+                    item.style.alignItems = 'flex-start';
+                    item.style.gap = '0.5rem';
+                    
+                    const situacaoHtml = situacao 
+                        ? `<div style="font-size: 0.75rem; color: #6b7280; width: 100%; padding-left: 1.5rem;">📝 ${this.escaparHTML(situacao)}</div>` 
+                        : '';
+                    
                     item.innerHTML = `
-                        <span class="hostname-item-nome">💻 ${hostname}</span>
-                        <div class="hostname-item-acoes">
-                            <button onclick="sistema.abrirModalEdicao(${indiceReal})" class="btn-secondary btn-sm" title="Editar">✏️</button>
-                            <button onclick="sistema.removerHostnameAtual(${idx})" class="btn-danger btn-sm" title="Excluir">✕</button>
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span class="hostname-item-nome">💻 ${hostname}</span>
+                            <div class="hostname-item-acoes">
+                                <button onclick="sistema.abrirModalEdicao(${indiceReal})" class="btn-secondary btn-sm" title="Editar">✏️</button>
+                                <button onclick="sistema.removerHostnameAtual(${idx})" class="btn-danger btn-sm" title="Excluir">✕</button>
+                            </div>
                         </div>
+                        ${situacaoHtml}
                     `;
                     lista.appendChild(item);
                 });
             }
 
             removerHostnameAtual(idx) {
-                const hostname = this.wizardState.hostnamesAtuais[idx];
+                const itemHost = this.wizardState.hostnamesAtuais[idx];
+                const hostname = typeof itemHost === 'string' ? itemHost : itemHost.hostname;
                 
                 // Remover do array atual
                 this.wizardState.hostnamesAtuais.splice(idx, 1);
@@ -3145,7 +3176,7 @@
                 corpo.innerHTML = '';
                 
                 if (this.dadosAtuais.length === 0) {
-                    corpo.innerHTML = '<tr><td colspan="7" class="text-center">Nenhum vínculo registrado</td></tr>';
+                    corpo.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum vínculo registrado</td></tr>';
                     return;
                 }
                 
@@ -3158,6 +3189,7 @@
                         <td>${item.area || ''}</td>
                         <td>${item.impressora || ''}</td>
                         <td><code>${item.hostname || ''}</code></td>
+                        <td style="max-width: 200px; font-size: 0.8125rem;">${this.escaparHTML(item.situacao || '')}</td>
                         <td class="text-center">
                             <button onclick="sistema.abrirModalEdicao(${indice})" class="btn-secondary btn-sm" title="Editar">✏️</button>
                             <button onclick="sistema.excluirItemWizard(${indice})" class="btn-danger btn-sm" title="Excluir">🗑️</button>
@@ -3266,6 +3298,7 @@
                 document.getElementById('editArea').value = item.area || '';
                 document.getElementById('editImpressora').value = item.impressora || '';
                 document.getElementById('editHostname').value = item.hostname || '';
+                document.getElementById('editSituacao').value = item.situacao || '';
                 document.getElementById('editIndice').value = indice;
                 
                 // Abrir modal
@@ -3277,6 +3310,7 @@
                 document.getElementById('modalEdicaoVinculo').classList.remove('ativo');
                 document.getElementById('formEdicaoVinculo').reset();
                 document.getElementById('editIndice').value = -1;
+                document.getElementById('editSituacao').value = '';
             }
 
             salvarEdicaoVinculo(evento) {
@@ -3294,10 +3328,11 @@
                 const area = document.getElementById('editArea').value.trim().toUpperCase();
                 const impressora = document.getElementById('editImpressora').value.trim().toUpperCase();
                 const hostname = document.getElementById('editHostname').value.trim().toUpperCase();
+                const situacao = document.getElementById('editSituacao').value.trim();
                 
                 // Validação
                 if (!predio || !andar || !setor || !area || !impressora || !hostname) {
-                    this.mostrarMensagemWizard('Preencha todos os campos', 'erro');
+                    this.mostrarMensagemWizard('Preencha todos os campos obrigatórios', 'erro');
                     return;
                 }
                 
@@ -3311,7 +3346,8 @@
                     andar,
                     area,
                     impressora,
-                    hostname
+                    hostname,
+                    situacao
                 };
                 
                 // Salvar
@@ -3325,7 +3361,11 @@
                 
                 // Atualizar lista de hostnames atuais se o item pertence ao contexto atual
                 if (this.wizardState.localizacao && this.wizardState.ambiente) {
-                    const idxHostnameAtual = this.wizardState.hostnamesAtuais.indexOf(hostnameAntigo);
+                    const idxHostnameAtual = this.wizardState.hostnamesAtuais.findIndex(h => {
+                        const hName = typeof h === 'string' ? h : h.hostname;
+                        return hName === hostnameAntigo;
+                    });
+                    
                     if (idxHostnameAtual !== -1) {
                         // Verificar se ainda pertence ao mesmo contexto
                         const mesmoContexto = 
@@ -3336,8 +3376,8 @@
                             impressora === this.wizardState.ambiente.impressora;
                         
                         if (mesmoContexto) {
-                            // Atualizar hostname na lista
-                            this.wizardState.hostnamesAtuais[idxHostnameAtual] = hostname;
+                            // Atualizar hostname e situação na lista
+                            this.wizardState.hostnamesAtuais[idxHostnameAtual] = { hostname, situacao };
                         } else {
                             // Remover da lista atual (mudou de contexto)
                             this.wizardState.hostnamesAtuais.splice(idxHostnameAtual, 1);
