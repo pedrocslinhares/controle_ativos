@@ -101,6 +101,12 @@
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
         }
 
+        input:disabled, select:disabled {
+            background-color: #f1f5f9;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
         textarea {
             resize: vertical;
             min-height: 80px;
@@ -109,6 +115,8 @@
         /* Campo com input manual */
         .campo-combo {
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .input-manual {
@@ -207,6 +215,12 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-primary {
             background: linear-gradient(to right, #6366f1, #4f46e5);
             color: #ffffff;
@@ -227,16 +241,29 @@
             color: #ffffff;
         }
 
+        .btn-warning {
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            color: #1f2937;
+        }
+
         .btn-sm {
             padding: 0.5rem 0.875rem;
             font-size: 0.8125rem;
             min-width: fit-content;
         }
 
+        .btn-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 1.25rem;
+        }
+
         /* Grid do Formulário */
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
         }
 
@@ -245,7 +272,6 @@
         }
 
         .form-actions {
-            grid-column: 1 / -1;
             display: flex;
             gap: 0.5rem;
             justify-content: flex-end;
@@ -627,6 +653,224 @@
             color: #d1d5db;
         }
 
+        /* ========================================= */
+        /* WIZARD - Formulário de Impressoras       */
+        /* ========================================= */
+        
+        .wizard-container {
+            margin-top: 1rem;
+        }
+
+        .wizard-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .wizard-steps::before {
+            content: '';
+            position: absolute;
+            top: 1.25rem;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+
+        .wizard-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .wizard-step-circle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .wizard-step.ativo .wizard-step-circle {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .wizard-step.completo .wizard-step-circle {
+            background: #10b981;
+            color: white;
+        }
+
+        .wizard-step-label {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .wizard-step.ativo .wizard-step-label {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+
+        .wizard-step.completo .wizard-step-label {
+            color: #10b981;
+        }
+
+        /* Contexto Fixado */
+        .contexto-fixado {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #86efac;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contexto-fixado-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .contexto-fixado-titulo {
+            font-weight: 600;
+            color: #166534;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contexto-fixado-dados {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .contexto-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.625rem;
+            background: white;
+            border: 1px solid #bbf7d0;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            color: #166534;
+        }
+
+        .contexto-tag strong {
+            color: #14532d;
+        }
+
+        /* Lista de Hostnames */
+        .hostnames-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .hostname-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .hostname-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .hostname-item-nome {
+            font-weight: 600;
+            color: #1f2937;
+            font-family: monospace;
+            font-size: 0.9375rem;
+        }
+
+        .hostname-item-acoes {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        /* Input com botão adicionar */
+        .input-com-acao {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+
+        .input-com-acao .campo-wrapper {
+            flex: 1;
+        }
+
+        /* Seção de Etapa */
+        .wizard-secao {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .wizard-secao-titulo {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .wizard-secao.desabilitada {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Resumo de Registros */
+        .resumo-registros {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #93c5fd;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .resumo-registros-titulo {
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .resumo-registros-contador {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
         /* Utilitários */
         .oculto {
             display: none !important;
@@ -644,13 +888,17 @@
         }
 
         /* Responsivo */
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             .container {
                 padding: 1rem;
             }
 
             h1 {
                 font-size: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
             }
 
             .form-actions {
@@ -685,6 +933,39 @@
             .hub-grid {
                 grid-template-columns: 1fr;
             }
+
+            .storage-compact {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 1rem;
+                align-self: flex-end;
+            }
+
+            .wizard-steps {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .wizard-steps::before {
+                display: none;
+            }
+
+            .wizard-step {
+                flex: 0 0 30%;
+            }
+
+            .input-com-acao {
+                flex-direction: column;
+            }
+
+            .input-com-acao .campo-wrapper {
+                width: 100%;
+            }
+
+            .input-com-acao button {
+                width: 100%;
+            }
         }
 
         /* Animações */
@@ -718,88 +999,75 @@
             animation: slideIn 0.3s ease-out;
         }
 
-        /* Indicador de Storage */
-        .storage-indicator {
-            margin-top: 2.5rem;
-            padding: 1.25rem;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
+        /* Indicador de Storage Compacto */
+        .container {
+            position: relative;
         }
 
-        .storage-header {
+        .storage-compact {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 0.75rem;
+            padding: 0.375rem 0.625rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: default;
+            z-index: 10;
         }
 
-        .storage-icon {
-            font-size: 1.25rem;
+        .storage-ring {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(#22c55e 0%, #e2e8f0 0%);
+            position: relative;
         }
 
-        .storage-title {
-            font-weight: 600;
-            color: #374151;
-            flex: 1;
+        .storage-ring::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
         }
 
-        .storage-percent {
+        .storage-percent-mini {
+            position: relative;
+            z-index: 1;
+            font-size: 0.5rem;
             font-weight: 700;
-            font-size: 1rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.375rem;
-            background-color: #e0e7ff;
-            color: #4338ca;
+            color: #374151;
         }
 
-        .storage-bar-container {
-            width: 100%;
-            height: 12px;
-            background-color: #e2e8f0;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .storage-bar {
-            height: 100%;
-            width: 0%;
-            border-radius: 6px;
-            transition: width 0.5s ease, background-color 0.3s ease;
-            background: linear-gradient(to right, #22c55e, #16a34a);
-        }
-
-        .storage-bar.warning {
-            background: linear-gradient(to right, #f59e0b, #d97706);
-        }
-
-        .storage-bar.danger {
-            background: linear-gradient(to right, #ef4444, #dc2626);
-        }
-
-        .storage-info {
-            margin-top: 0.5rem;
-            font-size: 0.8125rem;
+        .storage-text {
+            font-size: 0.6875rem;
             color: #6b7280;
-            text-align: center;
+            white-space: nowrap;
         }
 
-        .storage-warning {
-            margin-top: 0.75rem;
-            padding: 0.625rem;
-            background-color: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 0.5rem;
-            color: #92400e;
-            font-size: 0.8125rem;
-            text-align: center;
-            font-weight: 500;
+        .storage-compact.warning .storage-ring {
+            background: conic-gradient(#f59e0b var(--percent), #e2e8f0 var(--percent));
         }
 
-        .storage-warning.critical {
-            background-color: #fee2e2;
-            border-color: #ef4444;
-            color: #991b1b;
+        .storage-compact.warning .storage-text {
+            color: #d97706;
+        }
+
+        .storage-compact.danger .storage-ring {
+            background: conic-gradient(#ef4444 var(--percent), #e2e8f0 var(--percent));
+        }
+
+        .storage-compact.danger .storage-text {
+            color: #dc2626;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -824,6 +1092,14 @@
     </div>
 
     <div class="container">
+        <!-- Indicador de Storage Compacto (Global) -->
+        <div id="storageIndicator" class="storage-compact">
+            <div id="storageRing" class="storage-ring">
+                <span id="storagePercentMini" class="storage-percent-mini"></span>
+            </div>
+            <span id="storageText" class="storage-text">0 KB de 5 MB</span>
+        </div>
+
         <!-- TELA HUB - Seleção de Tipo de Formulário -->
         <div id="telaHub" class="tela">
             <h1>🗂️ Sistema de Coletas</h1>
@@ -831,24 +1107,6 @@
                 Selecione o tipo de formulário para iniciar
             </p>
             <div id="hubGrid" class="hub-grid"></div>
-            
-            <!-- Indicador de Storage -->
-            <div id="storageIndicator" class="storage-indicator">
-                <div class="storage-header">
-                    <span class="storage-icon">💾</span>
-                    <span class="storage-title">Armazenamento Local</span>
-                    <span id="storagePercent" class="storage-percent">0%</span>
-                </div>
-                <div class="storage-bar-container">
-                    <div id="storageBar" class="storage-bar"></div>
-                </div>
-                <div class="storage-info">
-                    <span id="storageUsed">0 KB</span> de <span id="storageLimit">4 MB</span>
-                </div>
-                <div id="storageWarning" class="storage-warning oculto">
-                    ⚠️ Armazenamento quase cheio! Considere exportar e limpar coletas antigas.
-                </div>
-            </div>
         </div>
 
         <!-- TELA PRINCIPAL - Menu do Formulário Selecionado -->
@@ -896,7 +1154,7 @@
             </div>
         </div>
 
-        <!-- TELA DADOS DA COLETA -->
+        <!-- TELA DADOS DA COLETA (Formulário Padrão) -->
         <div id="telaDadosColeta" class="tela oculto">
             <div class="breadcrumb">
                 <span class="breadcrumb-item" onclick="sistema.irParaHub()">🏠 Início</span>
@@ -925,9 +1183,8 @@
             <!-- Conteúdo do Formulário - Renderizado Dinamicamente -->
             <div id="conteudoFormulario" class="conteudo-aba">
                 <h3>➕ Adicionar Novo Item</h3>
-                <form id="formularioCadastro" class="form-grid">
-                    <!-- Campos serão renderizados dinamicamente -->
-                    <div id="camposFormulario"></div>
+                <form id="formularioCadastro">
+                    <div id="camposFormulario" class="form-grid"></div>
                     
                     <div class="form-actions">
                         <button type="button" id="btnLimparForm" class="btn-secondary">
@@ -988,6 +1245,247 @@
                 </button>
             </div>
         </div>
+
+        <!-- TELA DADOS DA COLETA - WIZARD (Formulário de Impressoras) -->
+        <div id="telaDadosColetaWizard" class="tela oculto">
+            <div class="breadcrumb">
+                <span class="breadcrumb-item" onclick="sistema.irParaHub()">🏠 Início</span>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item" onclick="sistema.voltarPrincipal()" id="breadcrumbTipoWizard"></span>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item" onclick="sistema.irParaListaColetas()">Coletas</span>
+                <span class="breadcrumb-separator">›</span>
+                <span id="breadcrumbColetaWizard" class="breadcrumb-item ativo"></span>
+            </div>
+            
+            <h2 id="tituloColetaAtualWizard"></h2>
+            
+            <div class="abas">
+                <button id="abaFormularioWizard" class="aba ativa">
+                    📝 Registro
+                </button>
+                <button id="abaTabelaWizard" class="aba">
+                    📊 Vínculos Registrados
+                    <span id="contadorItensWizard" class="badge-contador">0</span>
+                </button>
+            </div>
+
+            <div id="mensagemWizard" class="mensagem"></div>
+
+            <!-- Conteúdo do Formulário Wizard -->
+            <div id="conteudoFormularioWizard" class="conteudo-aba wizard-container">
+                
+                <!-- Indicador de Etapas -->
+                <div class="wizard-steps">
+                    <div class="wizard-step ativo" data-step="1">
+                        <div class="wizard-step-circle">1</div>
+                        <div class="wizard-step-label">Localização</div>
+                    </div>
+                    <div class="wizard-step" data-step="2">
+                        <div class="wizard-step-circle">2</div>
+                        <div class="wizard-step-label">Ambiente</div>
+                    </div>
+                    <div class="wizard-step" data-step="3">
+                        <div class="wizard-step-circle">3</div>
+                        <div class="wizard-step-label">Hostnames</div>
+                    </div>
+                </div>
+
+                <!-- Contexto Fixado - Localização -->
+                <div id="contextoLocalizacao" class="contexto-fixado oculto">
+                    <div class="contexto-fixado-header">
+                        <span class="contexto-fixado-titulo">📍 Localização Definida</span>
+                        <button type="button" onclick="sistema.novaLocalizacao()" class="btn-warning btn-sm">
+                            🔄 Alterar
+                        </button>
+                    </div>
+                    <div class="contexto-fixado-dados" id="dadosLocalizacaoFixada"></div>
+                </div>
+
+                <!-- Contexto Fixado - Ambiente -->
+                <div id="contextoAmbiente" class="contexto-fixado oculto">
+                    <div class="contexto-fixado-header">
+                        <span class="contexto-fixado-titulo">🖨️ Ambiente/Impressora</span>
+                        <button type="button" onclick="sistema.novoAmbiente()" class="btn-warning btn-sm">
+                            🔄 Alterar
+                        </button>
+                    </div>
+                    <div class="contexto-fixado-dados" id="dadosAmbienteFixado"></div>
+                </div>
+
+                <!-- Seção 1: Localização -->
+                <div id="secaoLocalizacao" class="wizard-secao">
+                    <div class="wizard-secao-titulo">📍 Definir Localização</div>
+                    <div class="form-grid">
+                        <div>
+                            <label for="wizPredio">PRÉDIO:<span style="color: red;">*</span></label>
+                            <select id="wizPredio" required>
+                                <option value="">Selecione...</option>
+                                <option value="ADMINISTRAÇÃO">ADMINISTRAÇÃO</option>
+                                <option value="UNIDADE 1">UNIDADE 1</option>
+                                <option value="UNIDADE 2">UNIDADE 2</option>
+                                <option value="UCA">UCA</option>
+                                <option value="AMBULATÓRIO 1">AMBULATÓRIO 1</option>
+                                <option value="AMBULATÓRIO 2">AMBULATÓRIO 2</option>
+                                <option value="UNACON">UNACON</option>
+                                <option value="SIF">SIF</option>
+                                <option value="SEGURANÇA">SEGURANÇA</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="wizAndar">ANDAR:<span style="color: red;">*</span></label>
+                            <select id="wizAndar" required>
+                                <option value="">Selecione...</option>
+                                <option value="CPA">CPA</option>
+                                <option value="SUBSOLO">SUBSOLO</option>
+                                <option value="TÉRREO">TÉRREO</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="full-width campo-combo">
+                            <label for="wizSetor">SETOR:<span style="color: red;">*</span></label>
+                            <select id="wizSetor" required>
+                                <option value="">Digite ou selecione...</option>
+                            </select>
+                            <div id="wizSetorManualContainer" class="input-manual">
+                                <label class="label-manual">Digite o setor:</label>
+                                <input type="text" id="wizSetorManual" placeholder="Ex: UTI ADULTO">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="btnFixarLocalizacao" class="btn-primary">
+                            ✅ Confirmar Localização
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Seção 2: Ambiente/Impressora -->
+                <div id="secaoAmbiente" class="wizard-secao desabilitada">
+                    <div class="wizard-secao-titulo">🖨️ Definir Ambiente e Impressora</div>
+                    <div class="form-grid">
+                        <div class="campo-combo">
+                            <label for="wizArea">ÁREA:<span style="color: red;">*</span></label>
+                            <select id="wizArea" required>
+                                <option value="">Digite ou selecione...</option>
+                            </select>
+                            <div id="wizAreaManualContainer" class="input-manual">
+                                <label class="label-manual">Digite a área:</label>
+                                <input type="text" id="wizAreaManual" placeholder="Ex: POSTO DE ENFERMAGEM">
+                            </div>
+                        </div>
+                        <div class="campo-combo">
+                            <label for="wizImpressora">IMPRESSORA:<span style="color: red;">*</span></label>
+                            <select id="wizImpressora" required>
+                                <option value="">Digite ou selecione...</option>
+                            </select>
+                            <div id="wizImpressoraManualContainer" class="input-manual">
+                                <label class="label-manual">Digite o nome/IP da impressora:</label>
+                                <input type="text" id="wizImpressoraManual" placeholder="Ex: IMP-UTI-01 ou 10.0.0.50">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="btnFixarAmbiente" class="btn-primary">
+                            ✅ Confirmar Ambiente
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Seção 3: Hostnames -->
+                <div id="secaoHostnames" class="wizard-secao desabilitada">
+                    <div class="wizard-secao-titulo">💻 Adicionar Computadores (Hostnames)</div>
+                    
+                    <div class="input-com-acao">
+                        <div class="campo-wrapper">
+                            <label for="wizHostname">HOSTNAME:<span style="color: red;">*</span></label>
+                            <input type="text" id="wizHostname" placeholder="Ex: PC-UTI-001" style="text-transform: uppercase;">
+                        </div>
+                        <button type="button" id="btnAdicionarHostname" class="btn-success">
+                            ➕ Adicionar
+                        </button>
+                    </div>
+
+                    <div id="listaHostnamesAtual" class="hostnames-lista"></div>
+
+                    <div class="dica" style="margin-top: 1rem;">
+                        💡 Adicione todos os computadores vinculados a esta impressora neste ambiente.
+                    </div>
+                </div>
+
+                <!-- Resumo -->
+                <div id="resumoWizard" class="resumo-registros oculto">
+                    <div class="resumo-registros-titulo">📊 Total de Vínculos Nesta Coleta</div>
+                    <div class="resumo-registros-contador" id="totalVinculosWizard">0</div>
+                </div>
+
+                <!-- Ações Finais -->
+                <div class="form-actions" style="margin-top: 2rem;">
+                    <button type="button" id="btnNovoAmbienteWizard" class="btn-secondary oculto">
+                        🔄 Nova Área/Impressora
+                    </button>
+                    <button type="button" id="btnNovaLocalizacaoWizard" class="btn-secondary oculto">
+                        📍 Nova Localização
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conteúdo da Tabela Wizard -->
+            <div id="conteudoTabelaWizard" class="conteudo-aba oculto">
+                <h3>📊 Vínculos Registrados</h3>
+                <div class="tabela-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Setor</th>
+                                <th>Prédio</th>
+                                <th>Andar</th>
+                                <th>Área</th>
+                                <th>Impressora</th>
+                                <th>Hostname</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaWizard"></tbody>
+                    </table>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 2rem;">
+                    <button id="btnExportarCSVWizard" class="btn-success">
+                        📤 Exportar para CSV
+                    </button>
+                    <button id="btnLimparTodosWizard" class="btn-danger">
+                        🗑️ Limpar Todos
+                    </button>
+                </div>
+
+                <div id="containerCSVWizard" class="csv-container oculto">
+                    <h3>📄 Dados CSV para Exportação:</h3>
+                    <textarea id="textoCSVWizard" class="csv-textarea" rows="10" readonly></textarea>
+                    <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.75rem;">
+                        <button id="btnCopiarCSVWizard" class="btn-primary btn-sm">
+                            📋 Copiar
+                        </button>
+                        <button id="btnBaixarCSVWizard" class="btn-secondary btn-sm">
+                            💾 Baixar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegação -->
+            <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 2rem;">
+                <button id="btnInicioWizard" class="btn-secondary">
+                    🏠 INÍCIO
+                </button>
+                <button id="btnTodasColetasWizard" class="btn-secondary">
+                    📂 TODAS COLETAS
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Único -->
@@ -1004,6 +1502,67 @@
         </div>
     </div>
 
+    <!-- Modal de Edição de Vínculo -->
+    <div id="modalEdicaoVinculo" class="modal">
+        <div class="modal-conteudo" style="max-width: 500px;">
+            <span class="modal-fechar" onclick="sistema.fecharModalEdicao()">&times;</span>
+            <h3>✏️ Editar Vínculo</h3>
+            <form id="formEdicaoVinculo" style="margin-top: 1rem;">
+                <div class="form-grid">
+                    <div>
+                        <label for="editPredio">PRÉDIO:</label>
+                        <select id="editPredio" required>
+                            <option value="">Selecione...</option>
+                            <option value="ADMINISTRAÇÃO">ADMINISTRAÇÃO</option>
+                            <option value="UNIDADE 1">UNIDADE 1</option>
+                            <option value="UNIDADE 2">UNIDADE 2</option>
+                            <option value="UCA">UCA</option>
+                            <option value="AMBULATÓRIO 1">AMBULATÓRIO 1</option>
+                            <option value="AMBULATÓRIO 2">AMBULATÓRIO 2</option>
+                            <option value="UNACON">UNACON</option>
+                            <option value="SIF">SIF</option>
+                            <option value="SEGURANÇA">SEGURANÇA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="editAndar">ANDAR:</label>
+                        <select id="editAndar" required>
+                            <option value="">Selecione...</option>
+                            <option value="CPA">CPA</option>
+                            <option value="SUBSOLO">SUBSOLO</option>
+                            <option value="TÉRREO">TÉRREO</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="full-width">
+                        <label for="editSetor">SETOR:</label>
+                        <input type="text" id="editSetor" required placeholder="Ex: UTI ADULTO" style="text-transform: uppercase;">
+                    </div>
+                    <div>
+                        <label for="editArea">ÁREA:</label>
+                        <input type="text" id="editArea" required placeholder="Ex: POSTO DE ENFERMAGEM" style="text-transform: uppercase;">
+                    </div>
+                    <div>
+                        <label for="editImpressora">IMPRESSORA:</label>
+                        <input type="text" id="editImpressora" required placeholder="Ex: IMP-UTI-01" style="text-transform: uppercase;">
+                    </div>
+                    <div class="full-width">
+                        <label for="editHostname">HOSTNAME:</label>
+                        <input type="text" id="editHostname" required placeholder="Ex: PC-UTI-001" style="text-transform: uppercase;">
+                    </div>
+                </div>
+                <div class="modal-botoes" style="margin-top: 1.5rem;">
+                    <button type="submit" class="btn-primary">💾 Salvar Alterações</button>
+                    <button type="button" class="btn-secondary" onclick="sistema.fecharModalEdicao()">Cancelar</button>
+                </div>
+            </form>
+            <input type="hidden" id="editIndice" value="-1">
+        </div>
+    </div>
+
     <script>
         // ===========================================================================
         // SISTEMA DE COLETAS MULTI-FORMULÁRIO
@@ -1017,6 +1576,14 @@
                 this.dadosAtuais = [];
                 this.indiceEdicao = -1;
                 this.promptInstalacao = null;
+                
+                // Estado específico do Wizard (Impressoras)
+                this.wizardState = {
+                    etapa: 1,
+                    localizacao: null,  // { predio, andar, setor }
+                    ambiente: null,     // { area, impressora }
+                    hostnamesAtuais: [] // hostnames pendentes do ambiente atual
+                };
                 
                 // Dados persistidos
                 this.colecoes = {};          // { tipo: { nomeColeta: [itens] } }
@@ -1035,13 +1602,14 @@
             
             definirTiposFormulario() {
                 return {
-                    equipamentos: {
-                        id: 'equipamentos',
-                        nome: 'Controle de Coletas de Equipamentos',
-                        nomeResumido: 'Equipamentos',
+                    coleta_completa: {
+                        id: 'coleta_completa',
+                        nome: 'Coleta Completa de Equipamentos',
+                        nomeResumido: 'Coleta Completa',
                         icone: '📋',
                         descricao: 'Cadastro de gabinetes, notebooks, monitores e ramais',
                         cor: '#4f46e5',
+                        modoWizard: false,
                         
                         // Base de dados específica
                         baseDados: {
@@ -1080,7 +1648,7 @@
                                 tipo: 'select',
                                 obrigatorio: true,
                                 opcoes: ['GABINETE', 'NOTEBOOK', 'MONITOR', 'RAMAL'],
-                                gatilho: 'atualizarMarcas' // Ação especial ao mudar
+                                gatilho: 'atualizarMarcas'
                             },
                             {
                                 id: 'marca',
@@ -1170,7 +1738,7 @@
                             }
                         ],
                         
-                        // Colunas da tabela (exportação e visualização)
+                        // Colunas da tabela
                         colunas: [
                             { id: 'tipo', label: 'Tipo' },
                             { id: 'marca', label: 'Marca' },
@@ -1196,12 +1764,33 @@
                             }
                             return { valido: true };
                         }
+                    },
+
+                    // =====================================================
+                    // NOVO TIPO: VÍNCULO DE IMPRESSORAS
+                    // =====================================================
+                    vinculo_impressoras: {
+                        id: 'vinculo_impressoras',
+                        nome: 'Coleta de Vínculo das Impressoras',
+                        nomeResumido: 'Vínculo Impressoras',
+                        icone: '🖨️',
+                        descricao: 'Mapear computadores e seus vínculos com impressoras por setor',
+                        cor: '#059669',
+                        modoWizard: true, // Indica que usa interface wizard
+                        
+                        // Colunas para exportação CSV (ordem conforme solicitado)
+                        colunas: [
+                            { id: 'setor', label: 'SETOR' },
+                            { id: 'predio', label: 'PRÉDIO' },
+                            { id: 'andar', label: 'ANDAR' },
+                            { id: 'area', label: 'ÁREA' },
+                            { id: 'impressora', label: 'IMPRESSORA' },
+                            { id: 'hostname', label: 'HOSTNAME' }
+                        ],
+                        
+                        // Não precisa de validarItem pois a lógica é diferente
+                        validarItem: null
                     }
-                    
-                    // Adicione outros tipos aqui conforme necessário
-                    // Exemplo:
-                    // moveis: { ... }
-                    // veiculos: { ... }
                 };
             }
 
@@ -1213,6 +1802,7 @@
                 this.carregarDados();
                 this.migrarDadosLegados();
                 this.configurarEventosGlobais();
+                this.configurarEventosWizard();
                 this.configurarPWA();
                 this.renderizarHub();
                 this.mostrarTela('telaHub');
@@ -1224,19 +1814,16 @@
             
             carregarDados() {
                 try {
-                    // Carregar coleções
                     const colecoes = localStorage.getItem('sistemaColecoesV2');
                     if (colecoes) {
                         this.colecoes = JSON.parse(colecoes);
                     }
                     
-                    // Carregar dados personalizados
                     const personalizados = localStorage.getItem('sistemaPersonalizadosV2');
                     if (personalizados) {
                         this.dadosPersonalizados = JSON.parse(personalizados);
                     }
                     
-                    // Carregar histórico
                     const historico = localStorage.getItem('sistemaHistoricoV2');
                     if (historico) {
                         this.historico = JSON.parse(historico);
@@ -1247,18 +1834,16 @@
             }
 
             migrarDadosLegados() {
-                // Migrar dados do formato antigo (v1) para o novo (v2)
                 try {
                     const dadosAntigos = localStorage.getItem('allEquipmentCollections');
-                    if (dadosAntigos && !this.colecoes.equipamentos) {
+                    if (dadosAntigos && !this.colecoes.coleta_completa) {
                         const parsed = JSON.parse(dadosAntigos);
                         
-                        this.colecoes.equipamentos = {};
+                        this.colecoes.coleta_completa = {};
                         
                         for (let nomeColeta in parsed) {
                             if (Array.isArray(parsed[nomeColeta])) {
-                                this.colecoes.equipamentos[nomeColeta] = parsed[nomeColeta].map(item => {
-                                    // Normalizar campos
+                                this.colecoes.coleta_completa[nomeColeta] = parsed[nomeColeta].map(item => {
                                     const itemNovo = {
                                         tipo: item.type === 'MINIPC' ? 'GABINETE' : item.type,
                                         marca: item.brand || '',
@@ -1283,17 +1868,33 @@
                         console.log('Migração de dados legados concluída');
                     }
                     
-                    // Migrar histórico antigo
+                    if (this.colecoes.equipamentos && !this.colecoes.coleta_completa) {
+                        this.colecoes.coleta_completa = this.colecoes.equipamentos;
+                        delete this.colecoes.equipamentos;
+                        this.salvarDados();
+                    }
+                    
                     const historicoAntigo = localStorage.getItem('locationHistory');
-                    if (historicoAntigo && !this.historico.equipamentos) {
-                        this.historico.equipamentos = JSON.parse(historicoAntigo);
+                    if (historicoAntigo && !this.historico.coleta_completa) {
+                        this.historico.coleta_completa = JSON.parse(historicoAntigo);
                         this.salvarHistorico();
                     }
                     
-                    // Migrar dados personalizados antigos
+                    if (this.historico.equipamentos && !this.historico.coleta_completa) {
+                        this.historico.coleta_completa = this.historico.equipamentos;
+                        delete this.historico.equipamentos;
+                        this.salvarHistorico();
+                    }
+                    
                     const persAntigo = localStorage.getItem('equipmentCustomData');
-                    if (persAntigo && !this.dadosPersonalizados.equipamentos) {
-                        this.dadosPersonalizados.equipamentos = JSON.parse(persAntigo);
+                    if (persAntigo && !this.dadosPersonalizados.coleta_completa) {
+                        this.dadosPersonalizados.coleta_completa = JSON.parse(persAntigo);
+                        this.salvarDadosPersonalizados();
+                    }
+                    
+                    if (this.dadosPersonalizados.equipamentos && !this.dadosPersonalizados.coleta_completa) {
+                        this.dadosPersonalizados.coleta_completa = this.dadosPersonalizados.equipamentos;
+                        delete this.dadosPersonalizados.equipamentos;
                         this.salvarDadosPersonalizados();
                     }
                 } catch (erro) {
@@ -1304,10 +1905,7 @@
             salvarDados() {
                 try {
                     localStorage.setItem('sistemaColecoesV2', JSON.stringify(this.colecoes));
-                    // Atualizar indicador se estiver visível
-                    if (!document.getElementById('telaHub').classList.contains('oculto')) {
-                        this.atualizarIndicadorStorage();
-                    }
+                    this.atualizarIndicadorStorage();
                 } catch (erro) {
                     console.error('Erro ao salvar:', erro);
                     if (erro.name === 'QuotaExceededError') {
@@ -1320,10 +1918,12 @@
 
             salvarDadosPersonalizados() {
                 localStorage.setItem('sistemaPersonalizadosV2', JSON.stringify(this.dadosPersonalizados));
+                this.atualizarIndicadorStorage();
             }
 
             salvarHistorico() {
                 localStorage.setItem('sistemaHistoricoV2', JSON.stringify(this.historico));
+                this.atualizarIndicadorStorage();
             }
 
             // ===========================================================================
@@ -1337,17 +1937,22 @@
                 if (idTela === 'telaDadosColeta') {
                     this.mostrarAba('formulario');
                 }
+                if (idTela === 'telaDadosColetaWizard') {
+                    this.mostrarAbaWizard('formulario');
+                }
             }
 
             irParaHub() {
                 this.tipoAtual = null;
                 this.colecaoAtual = null;
+                this.resetarWizard();
                 this.renderizarHub();
                 this.mostrarTela('telaHub');
             }
 
             voltarPrincipal() {
                 this.colecaoAtual = null;
+                this.resetarWizard();
                 this.mostrarTela('telaPrincipal');
             }
 
@@ -1360,17 +1965,16 @@
                 this.tipoAtual = tipoId;
                 const tipo = this.tiposFormulario[tipoId];
                 
-                // Atualizar títulos
                 document.getElementById('tituloPrincipal').innerHTML = `${tipo.icone} ${tipo.nome}`;
                 document.getElementById('breadcrumbTipo').textContent = tipo.nomeResumido;
                 document.getElementById('breadcrumbTipo2').textContent = tipo.nomeResumido;
                 document.getElementById('breadcrumbTipo3').textContent = tipo.nomeResumido;
+                document.getElementById('breadcrumbTipoWizard').textContent = tipo.nomeResumido;
                 document.getElementById('tituloListaColetas').innerHTML = `📋 Coletas de ${tipo.nomeResumido}`;
                 
-                // Inicializar estruturas se não existirem
                 if (!this.colecoes[tipoId]) this.colecoes[tipoId] = {};
                 if (!this.dadosPersonalizados[tipoId]) this.dadosPersonalizados[tipoId] = {};
-                if (!this.historico[tipoId]) this.historico[tipoId] = { setores: {}, locais: {} };
+                if (!this.historico[tipoId]) this.historico[tipoId] = { setores: {}, locais: {}, areas: {}, impressoras: {} };
                 
                 this.mostrarTela('telaPrincipal');
             }
@@ -1392,6 +1996,26 @@
                     conteudoForm.classList.add('oculto');
                     conteudoTab.classList.remove('oculto');
                     this.renderizarTabela();
+                }
+            }
+
+            mostrarAbaWizard(aba) {
+                const abaForm = document.getElementById('abaFormularioWizard');
+                const abaTab = document.getElementById('abaTabelaWizard');
+                const conteudoForm = document.getElementById('conteudoFormularioWizard');
+                const conteudoTab = document.getElementById('conteudoTabelaWizard');
+                
+                if (aba === 'formulario') {
+                    abaForm.classList.add('ativa');
+                    abaTab.classList.remove('ativa');
+                    conteudoForm.classList.remove('oculto');
+                    conteudoTab.classList.add('oculto');
+                } else {
+                    abaForm.classList.remove('ativa');
+                    abaTab.classList.add('ativa');
+                    conteudoForm.classList.add('oculto');
+                    conteudoTab.classList.remove('oculto');
+                    this.renderizarTabelaWizard();
                 }
             }
 
@@ -1424,7 +2048,6 @@
                     grid.appendChild(card);
                 }
                 
-                // Atualizar indicador de storage
                 this.atualizarIndicadorStorage();
             }
 
@@ -1452,12 +2075,25 @@
                 this.dadosAtuais = this.colecoes[this.tipoAtual][nome] || [];
                 
                 const tipo = this.tiposFormulario[this.tipoAtual];
-                document.getElementById('tituloColetaAtual').textContent = `Coleta: ${nome}`;
-                document.getElementById('breadcrumbColeta').textContent = nome;
-                document.getElementById('contadorItens').textContent = this.dadosAtuais.length;
                 
-                this.renderizarFormulario();
-                this.mostrarTela('telaDadosColeta');
+                if (tipo.modoWizard) {
+                    // Usar interface Wizard
+                    document.getElementById('tituloColetaAtualWizard').textContent = `Coleta: ${nome}`;
+                    document.getElementById('breadcrumbColetaWizard').textContent = nome;
+                    document.getElementById('contadorItensWizard').textContent = this.dadosAtuais.length;
+                    
+                    this.resetarWizard();
+                    this.inicializarWizard();
+                    this.mostrarTela('telaDadosColetaWizard');
+                } else {
+                    // Usar interface padrão
+                    document.getElementById('tituloColetaAtual').textContent = `Coleta: ${nome}`;
+                    document.getElementById('breadcrumbColeta').textContent = nome;
+                    document.getElementById('contadorItens').textContent = this.dadosAtuais.length;
+                    
+                    this.renderizarFormulario();
+                    this.mostrarTela('telaDadosColeta');
+                }
             }
 
             async excluirColecao(nome) {
@@ -1518,7 +2154,7 @@
             }
 
             // ===========================================================================
-            // RENDERIZAÇÃO DINÂMICA DO FORMULÁRIO
+            // RENDERIZAÇÃO DINÂMICA DO FORMULÁRIO (PADRÃO)
             // ===========================================================================
             
             renderizarFormulario() {
@@ -1620,17 +2256,14 @@
                     const elemento = document.getElementById(campo.id);
                     if (!elemento) return;
                     
-                    // Converter para maiúsculas em inputs de texto
                     if (campo.tipo === 'text') {
                         elemento.addEventListener('input', () => {
                             elemento.value = elemento.value.toUpperCase();
                         });
                     }
                     
-                    // Configurar select-dinamico
                     if (campo.tipo === 'select-dinamico') {
                         if (campo.dependeDe === 'tipo') {
-                            // Campo tipo -> atualiza marcas
                             const tipoSelect = document.getElementById('tipo');
                             if (tipoSelect) {
                                 tipoSelect.addEventListener('change', () => this.atualizarMarcas());
@@ -1655,7 +2288,6 @@
                         }
                     }
                     
-                    // Configurar select-historico
                     if (campo.tipo === 'select-historico') {
                         this.atualizarSelectHistorico(campo.id, campo.historicoKey);
                         
@@ -1708,7 +2340,6 @@
                 
                 const tipoEquip = tipoSelect.value;
                 
-                // Reset
                 marcaSelect.innerHTML = '<option value="">Selecione...</option>';
                 if (modeloSelect) {
                     modeloSelect.innerHTML = '<option value="">Selecione a marca primeiro...</option>';
@@ -1730,7 +2361,6 @@
                     marcaSelect.appendChild(option);
                 });
                 
-                // Adicionar opção "Outro..."
                 const optOutro = document.createElement('option');
                 optOutro.value = 'OUTRO';
                 optOutro.textContent = '➕ Outro...';
@@ -1770,7 +2400,6 @@
                     modeloSelect.appendChild(option);
                 });
                 
-                // Adicionar opção "Outro..."
                 const optOutro = document.createElement('option');
                 optOutro.value = 'OUTRO';
                 optOutro.textContent = '➕ Outro...';
@@ -1794,7 +2423,6 @@
                 select.innerHTML = '<option value="">Digite ou selecione...</option>';
                 
                 if (ordenados.length > 0) {
-                    // Top 5
                     ordenados.slice(0, 5).forEach(([valor, freq]) => {
                         const option = document.createElement('option');
                         option.value = valor;
@@ -1802,7 +2430,6 @@
                         select.appendChild(option);
                     });
                     
-                    // Resto
                     if (ordenados.length > 5) {
                         const optgroup = document.createElement('optgroup');
                         optgroup.label = '──────────';
@@ -1817,7 +2444,6 @@
                     }
                 }
                 
-                // Opção "Outro..."
                 const optOutro = document.createElement('option');
                 optOutro.value = 'OUTRO';
                 optOutro.textContent = '➕ Outro...';
@@ -1832,7 +2458,7 @@
                 valor = valor.toUpperCase().trim();
                 
                 if (!this.historico[this.tipoAtual]) {
-                    this.historico[this.tipoAtual] = { setores: {}, locais: {} };
+                    this.historico[this.tipoAtual] = { setores: {}, locais: {}, areas: {}, impressoras: {} };
                 }
                 
                 if (!this.historico[this.tipoAtual][historicoKey]) {
@@ -1868,7 +2494,7 @@
             }
 
             // ===========================================================================
-            // CRUD DE ITENS
+            // CRUD DE ITENS (FORMULÁRIO PADRÃO)
             // ===========================================================================
             
             salvarItem(evento) {
@@ -1877,7 +2503,6 @@
                 const tipo = this.tiposFormulario[this.tipoAtual];
                 const item = {};
                 
-                // Coletar valores dos campos
                 tipo.campos.forEach(campo => {
                     const select = document.getElementById(campo.id);
                     const manual = document.getElementById(`${campo.id}Manual`);
@@ -1893,7 +2518,6 @@
                         }
                     }
                     
-                    // Normalizar para maiúsculas
                     if (typeof valor === 'string' && campo.tipo !== 'number') {
                         valor = valor.toUpperCase();
                     }
@@ -1901,7 +2525,6 @@
                     item[campo.id] = valor;
                 });
 
-                // Validações obrigatórias
                 for (let campo of tipo.campos) {
                     if (campo.obrigatorio && !item[campo.id]) {
                         this.mostrarMensagem(`Preencha o campo ${campo.label}`, 'erro');
@@ -1909,7 +2532,6 @@
                     }
                 }
 
-                // Validação customizada do tipo
                 if (tipo.validarItem) {
                     const resultado = tipo.validarItem(item);
                     if (!resultado.valido) {
@@ -1918,16 +2540,13 @@
                     }
                 }
 
-                // Adicionar dados personalizados (marca/modelo)
                 if (item.tipo && item.marca) {
                     this.adicionarDadoPersonalizado(item.tipo, item.marca, item.modelo);
                 }
                 
-                // Adicionar ao histórico
                 if (item.setor) this.adicionarHistorico('setores', item.setor);
                 if (item.local) this.adicionarHistorico('locais', item.local);
 
-                // Salvar
                 if (this.indiceEdicao === -1) {
                     this.dadosAtuais.push(item);
                     this.mostrarMensagem('Item adicionado com sucesso!');
@@ -1941,7 +2560,6 @@
                 this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
                 this.salvarDados();
                 
-                // Atualizar listas
                 this.atualizarSelectHistorico('setor', 'setores');
                 this.atualizarSelectHistorico('local', 'locais');
                 
@@ -1981,23 +2599,19 @@
                 document.getElementById('btnSalvarItem').innerHTML = '✏️ Atualizar Item';
                 this.mostrarAba('formulario');
                 
-                // Preencher campos em sequência com Promises para garantir ordem
                 this.preencherCamposEdicao(item, tipoConfig);
                 this.mostrarMensagem('Editando item...');
             }
 
             async preencherCamposEdicao(item, tipoConfig) {
-                // 1. Preencher campo TIPO primeiro (dispara atualização de marcas)
                 const tipoEl = document.getElementById('tipo');
                 if (tipoEl && item.tipo) {
                     tipoEl.value = item.tipo;
                     this.atualizarMarcas();
                 }
                 
-                // Aguardar DOM atualizar
                 await this.aguardar(100);
                 
-                // 2. Preencher MARCA (dispara atualização de modelos)
                 const marcaEl = document.getElementById('marca');
                 if (marcaEl && item.marca) {
                     const marcaExiste = Array.from(marcaEl.options).some(opt => opt.value === item.marca);
@@ -2014,10 +2628,8 @@
                     this.atualizarModelos();
                 }
                 
-                // Aguardar DOM atualizar
                 await this.aguardar(100);
                 
-                // 3. Preencher MODELO
                 const modeloEl = document.getElementById('modelo');
                 if (modeloEl && item.modelo) {
                     const modeloExiste = Array.from(modeloEl.options).some(opt => opt.value === item.modelo);
@@ -2033,9 +2645,7 @@
                     }
                 }
                 
-                // 4. Preencher demais campos (não dinâmicos)
                 tipoConfig.campos.forEach(campo => {
-                    // Pular campos já preenchidos
                     if (['tipo', 'marca', 'modelo'].includes(campo.id)) return;
                     
                     const elemento = document.getElementById(campo.id);
@@ -2101,7 +2711,6 @@
             limparFormulario() {
                 document.getElementById('formularioCadastro').reset();
                 
-                // Ocultar todos os containers manuais
                 document.querySelectorAll('.input-manual').forEach(el => {
                     el.classList.remove('visivel');
                 });
@@ -2111,7 +2720,7 @@
             }
 
             // ===========================================================================
-            // TABELA
+            // TABELA (FORMULÁRIO PADRÃO)
             // ===========================================================================
             
             renderizarCabecalhoTabela() {
@@ -2155,7 +2764,643 @@
             }
 
             // ===========================================================================
-            // EXPORTAÇÃO
+            // WIZARD - VÍNCULO DE IMPRESSORAS
+            // ===========================================================================
+
+            resetarWizard() {
+                this.wizardState = {
+                    etapa: 1,
+                    localizacao: null,
+                    ambiente: null,
+                    hostnamesAtuais: []
+                };
+            }
+
+            inicializarWizard() {
+                // Atualizar selects de histórico
+                this.atualizarSelectHistoricoWizard('wizSetor', 'setores');
+                this.atualizarSelectHistoricoWizard('wizArea', 'areas');
+                this.atualizarSelectHistoricoWizard('wizImpressora', 'impressoras');
+                
+                // Resetar UI
+                this.atualizarEtapaWizard(1);
+                document.getElementById('contextoLocalizacao').classList.add('oculto');
+                document.getElementById('contextoAmbiente').classList.add('oculto');
+                document.getElementById('secaoLocalizacao').classList.remove('desabilitada');
+                document.getElementById('secaoAmbiente').classList.add('desabilitada');
+                document.getElementById('secaoHostnames').classList.add('desabilitada');
+                document.getElementById('btnNovoAmbienteWizard').classList.add('oculto');
+                document.getElementById('btnNovaLocalizacaoWizard').classList.add('oculto');
+                document.getElementById('resumoWizard').classList.add('oculto');
+                
+                // Limpar campos
+                document.getElementById('wizPredio').value = '';
+                document.getElementById('wizAndar').value = '';
+                document.getElementById('wizSetor').value = '';
+                document.getElementById('wizSetorManual').value = '';
+                document.getElementById('wizSetorManualContainer').classList.remove('visivel');
+                document.getElementById('wizArea').value = '';
+                document.getElementById('wizAreaManual').value = '';
+                document.getElementById('wizAreaManualContainer').classList.remove('visivel');
+                document.getElementById('wizImpressora').value = '';
+                document.getElementById('wizImpressoraManual').value = '';
+                document.getElementById('wizImpressoraManualContainer').classList.remove('visivel');
+                document.getElementById('wizHostname').value = '';
+                document.getElementById('listaHostnamesAtual').innerHTML = '';
+                
+                this.atualizarContadorWizard();
+            }
+
+            atualizarSelectHistoricoWizard(campoId, historicoKey) {
+                const select = document.getElementById(campoId);
+                if (!select) return;
+                
+                const historicoDados = this.historico[this.tipoAtual]?.[historicoKey] || {};
+                const ordenados = Object.entries(historicoDados)
+                    .sort((a, b) => b[1] - a[1]);
+                
+                select.innerHTML = '<option value="">Digite ou selecione...</option>';
+                
+                if (ordenados.length > 0) {
+                    ordenados.slice(0, 5).forEach(([valor]) => {
+                        const option = document.createElement('option');
+                        option.value = valor;
+                        option.textContent = valor;
+                        select.appendChild(option);
+                    });
+                    
+                    if (ordenados.length > 5) {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = '──────────';
+                        select.appendChild(optgroup);
+                        
+                        ordenados.slice(5).forEach(([valor]) => {
+                            const option = document.createElement('option');
+                            option.value = valor;
+                            option.textContent = valor;
+                            select.appendChild(option);
+                        });
+                    }
+                }
+                
+                const optOutro = document.createElement('option');
+                optOutro.value = 'OUTRO';
+                optOutro.textContent = '➕ Outro...';
+                optOutro.style.fontWeight = 'bold';
+                optOutro.style.color = '#6366f1';
+                select.appendChild(optOutro);
+            }
+
+            atualizarEtapaWizard(etapa) {
+                this.wizardState.etapa = etapa;
+                
+                document.querySelectorAll('.wizard-step').forEach(step => {
+                    const stepNum = parseInt(step.dataset.step);
+                    step.classList.remove('ativo', 'completo');
+                    
+                    if (stepNum < etapa) {
+                        step.classList.add('completo');
+                    } else if (stepNum === etapa) {
+                        step.classList.add('ativo');
+                    }
+                });
+            }
+
+            fixarLocalizacao() {
+                const predio = document.getElementById('wizPredio').value;
+                const andar = document.getElementById('wizAndar').value;
+                let setor = document.getElementById('wizSetor').value;
+                
+                if (setor === 'OUTRO') {
+                    setor = document.getElementById('wizSetorManual').value.trim().toUpperCase();
+                }
+                
+                if (!predio || !andar || !setor) {
+                    this.mostrarMensagemWizard('Preencha todos os campos de localização', 'erro');
+                    return;
+                }
+                
+                this.wizardState.localizacao = { predio, andar, setor };
+                
+                // Atualizar histórico
+                this.adicionarHistorico('setores', setor);
+                
+                // Atualizar UI
+                document.getElementById('contextoLocalizacao').classList.remove('oculto');
+                document.getElementById('dadosLocalizacaoFixada').innerHTML = `
+                    <span class="contexto-tag"><strong>Prédio:</strong> ${predio}</span>
+                    <span class="contexto-tag"><strong>Andar:</strong> ${andar}</span>
+                    <span class="contexto-tag"><strong>Setor:</strong> ${setor}</span>
+                `;
+                
+                document.getElementById('secaoLocalizacao').classList.add('oculto');
+                document.getElementById('secaoAmbiente').classList.remove('desabilitada');
+                
+                this.atualizarEtapaWizard(2);
+                this.mostrarMensagemWizard('Localização definida! Agora defina o ambiente.');
+            }
+
+            redefinirLocalizacao() {
+                this.wizardState.localizacao = null;
+                this.wizardState.ambiente = null;
+                this.wizardState.hostnamesAtuais = [];
+                
+                document.getElementById('contextoLocalizacao').classList.add('oculto');
+                document.getElementById('contextoAmbiente').classList.add('oculto');
+                document.getElementById('secaoLocalizacao').classList.remove('oculto');
+                document.getElementById('secaoLocalizacao').classList.remove('desabilitada');
+                document.getElementById('secaoAmbiente').classList.add('desabilitada');
+                document.getElementById('secaoHostnames').classList.add('desabilitada');
+                document.getElementById('btnNovoAmbienteWizard').classList.add('oculto');
+                document.getElementById('btnNovaLocalizacaoWizard').classList.add('oculto');
+                document.getElementById('listaHostnamesAtual').innerHTML = '';
+                
+                this.atualizarEtapaWizard(1);
+            }
+
+            fixarAmbiente() {
+                let area = document.getElementById('wizArea').value;
+                let impressora = document.getElementById('wizImpressora').value;
+                
+                if (area === 'OUTRO') {
+                    area = document.getElementById('wizAreaManual').value.trim().toUpperCase();
+                }
+                if (impressora === 'OUTRO') {
+                    impressora = document.getElementById('wizImpressoraManual').value.trim().toUpperCase();
+                }
+                
+                if (!area || !impressora) {
+                    this.mostrarMensagemWizard('Preencha a área e a impressora', 'erro');
+                    return;
+                }
+                
+                this.wizardState.ambiente = { area, impressora };
+                this.wizardState.hostnamesAtuais = [];
+                
+                // Atualizar histórico
+                this.adicionarHistorico('areas', area);
+                this.adicionarHistorico('impressoras', impressora);
+                
+                // Atualizar UI
+                document.getElementById('contextoAmbiente').classList.remove('oculto');
+                document.getElementById('dadosAmbienteFixado').innerHTML = `
+                    <span class="contexto-tag"><strong>Área:</strong> ${area}</span>
+                    <span class="contexto-tag"><strong>Impressora:</strong> ${impressora}</span>
+                `;
+                
+                document.getElementById('secaoAmbiente').classList.add('oculto');
+                document.getElementById('secaoHostnames').classList.remove('desabilitada');
+                document.getElementById('btnNovoAmbienteWizard').classList.remove('oculto');
+                document.getElementById('btnNovaLocalizacaoWizard').classList.remove('oculto');
+                document.getElementById('resumoWizard').classList.remove('oculto');
+                
+                this.atualizarEtapaWizard(3);
+                document.getElementById('wizHostname').focus();
+                this.mostrarMensagemWizard('Ambiente definido! Adicione os hostnames.');
+            }
+
+            redefinirAmbiente() {
+                this.wizardState.ambiente = null;
+                this.wizardState.hostnamesAtuais = [];
+                
+                document.getElementById('contextoAmbiente').classList.add('oculto');
+                document.getElementById('secaoAmbiente').classList.remove('oculto');
+                document.getElementById('secaoAmbiente').classList.remove('desabilitada');
+                document.getElementById('secaoHostnames').classList.add('desabilitada');
+                document.getElementById('btnNovoAmbienteWizard').classList.add('oculto');
+                document.getElementById('btnNovaLocalizacaoWizard').classList.add('oculto');
+                document.getElementById('listaHostnamesAtual').innerHTML = '';
+                
+                // Limpar campos do ambiente
+                document.getElementById('wizArea').value = '';
+                document.getElementById('wizAreaManual').value = '';
+                document.getElementById('wizAreaManualContainer').classList.remove('visivel');
+                document.getElementById('wizImpressora').value = '';
+                document.getElementById('wizImpressoraManual').value = '';
+                document.getElementById('wizImpressoraManualContainer').classList.remove('visivel');
+                
+                this.atualizarEtapaWizard(2);
+            }
+
+            adicionarHostname() {
+                const input = document.getElementById('wizHostname');
+                const hostname = input.value.trim().toUpperCase();
+                
+                if (!hostname) {
+                    this.mostrarMensagemWizard('Digite o hostname', 'erro');
+                    return;
+                }
+                
+                if (!this.wizardState.localizacao || !this.wizardState.ambiente) {
+                    this.mostrarMensagemWizard('Defina localização e ambiente primeiro', 'erro');
+                    return;
+                }
+                
+                // Verificar se hostname já existe nesta sessão
+                if (this.wizardState.hostnamesAtuais.includes(hostname)) {
+                    this.mostrarMensagemWizard('Este hostname já foi adicionado', 'erro');
+                    return;
+                }
+                
+                // Criar registro completo (desnormalizado para CSV)
+                const registro = {
+                    setor: this.wizardState.localizacao.setor,
+                    predio: this.wizardState.localizacao.predio,
+                    andar: this.wizardState.localizacao.andar,
+                    area: this.wizardState.ambiente.area,
+                    impressora: this.wizardState.ambiente.impressora,
+                    hostname: hostname
+                };
+                
+                // Salvar
+                this.dadosAtuais.push(registro);
+                this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
+                this.salvarDados();
+                
+                // Atualizar lista visual
+                this.wizardState.hostnamesAtuais.push(hostname);
+                this.renderizarListaHostnamesAtuais();
+                
+                // Limpar e focar
+                input.value = '';
+                input.focus();
+                
+                this.atualizarContadorWizard();
+                this.mostrarMensagemWizard(`Hostname "${hostname}" adicionado!`);
+            }
+
+            renderizarListaHostnamesAtuais() {
+                const lista = document.getElementById('listaHostnamesAtual');
+                lista.innerHTML = '';
+                
+                if (this.wizardState.hostnamesAtuais.length === 0) {
+                    lista.innerHTML = '<p class="text-center" style="color: #9ca3af; font-size: 0.875rem;">Nenhum hostname adicionado ainda</p>';
+                    return;
+                }
+                
+                this.wizardState.hostnamesAtuais.forEach((hostname, idx) => {
+                    // Encontrar o índice real no dadosAtuais
+                    const indiceReal = this.dadosAtuais.findIndex(item => 
+                        item.hostname === hostname &&
+                        item.setor === this.wizardState.localizacao.setor &&
+                        item.area === this.wizardState.ambiente.area &&
+                        item.impressora === this.wizardState.ambiente.impressora
+                    );
+                    
+                    const item = document.createElement('div');
+                    item.className = 'hostname-item';
+                    item.innerHTML = `
+                        <span class="hostname-item-nome">💻 ${hostname}</span>
+                        <div class="hostname-item-acoes">
+                            <button onclick="sistema.abrirModalEdicao(${indiceReal})" class="btn-secondary btn-sm" title="Editar">✏️</button>
+                            <button onclick="sistema.removerHostnameAtual(${idx})" class="btn-danger btn-sm" title="Excluir">✕</button>
+                        </div>
+                    `;
+                    lista.appendChild(item);
+                });
+            }
+
+            removerHostnameAtual(idx) {
+                const hostname = this.wizardState.hostnamesAtuais[idx];
+                
+                // Remover do array atual
+                this.wizardState.hostnamesAtuais.splice(idx, 1);
+                
+                // Encontrar e remover do dadosAtuais
+                const indexRemover = this.dadosAtuais.findIndex(item => 
+                    item.hostname === hostname &&
+                    item.setor === this.wizardState.localizacao.setor &&
+                    item.area === this.wizardState.ambiente.area &&
+                    item.impressora === this.wizardState.ambiente.impressora
+                );
+                
+                if (indexRemover !== -1) {
+                    this.dadosAtuais.splice(indexRemover, 1);
+                    this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
+                    this.salvarDados();
+                }
+                
+                this.renderizarListaHostnamesAtuais();
+                this.atualizarContadorWizard();
+                this.mostrarMensagemWizard('Hostname removido');
+            }
+
+            atualizarContadorWizard() {
+                document.getElementById('contadorItensWizard').textContent = this.dadosAtuais.length;
+                document.getElementById('totalVinculosWizard').textContent = this.dadosAtuais.length;
+            }
+
+            novoAmbiente() {
+                this.redefinirAmbiente();
+                this.atualizarSelectHistoricoWizard('wizArea', 'areas');
+                this.atualizarSelectHistoricoWizard('wizImpressora', 'impressoras');
+            }
+
+            novaLocalizacao() {
+                this.redefinirLocalizacao();
+                this.atualizarSelectHistoricoWizard('wizSetor', 'setores');
+            }
+
+            // Tabela do Wizard
+            renderizarTabelaWizard() {
+                const corpo = document.getElementById('corpoTabelaWizard');
+                corpo.innerHTML = '';
+                
+                if (this.dadosAtuais.length === 0) {
+                    corpo.innerHTML = '<tr><td colspan="7" class="text-center">Nenhum vínculo registrado</td></tr>';
+                    return;
+                }
+                
+                this.dadosAtuais.forEach((item, indice) => {
+                    const linha = corpo.insertRow();
+                    linha.innerHTML = `
+                        <td>${item.setor || ''}</td>
+                        <td>${item.predio || ''}</td>
+                        <td>${item.andar || ''}</td>
+                        <td>${item.area || ''}</td>
+                        <td>${item.impressora || ''}</td>
+                        <td><code>${item.hostname || ''}</code></td>
+                        <td class="text-center">
+                            <button onclick="sistema.abrirModalEdicao(${indice})" class="btn-secondary btn-sm" title="Editar">✏️</button>
+                            <button onclick="sistema.excluirItemWizard(${indice})" class="btn-danger btn-sm" title="Excluir">🗑️</button>
+                        </td>
+                    `;
+                });
+            }
+
+            async excluirItemWizard(indice) {
+                const confirmar = await this.abrirModalConfirmacao(
+                    'Excluir Vínculo',
+                    'Deseja realmente excluir este vínculo?'
+                );
+                
+                if (confirmar) {
+                    this.dadosAtuais.splice(indice, 1);
+                    this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
+                    this.salvarDados();
+                    this.renderizarTabelaWizard();
+                    this.atualizarContadorWizard();
+                    this.renderizarHub();
+                    this.mostrarMensagemWizard('Vínculo excluído');
+                }
+            }
+
+            async limparTodosWizard() {
+                const confirmar = await this.abrirModalConfirmacao(
+                    'Limpar Todos',
+                    'ATENÇÃO: Isso apagará TODOS os vínculos desta coleta. Continuar?'
+                );
+                
+                if (confirmar) {
+                    this.dadosAtuais = [];
+                    this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
+                    this.salvarDados();
+                    this.renderizarTabelaWizard();
+                    this.atualizarContadorWizard();
+                    this.renderizarHub();
+                    this.wizardState.hostnamesAtuais = [];
+                    this.renderizarListaHostnamesAtuais();
+                    this.mostrarMensagemWizard('Todos os vínculos foram removidos', 'erro');
+                }
+            }
+
+            exportarColecaoWizard() {
+                if (this.dadosAtuais.length === 0) {
+                    this.mostrarMensagemWizard('Nenhum dado para exportar', 'erro');
+                    return;
+                }
+                
+                const tipo = this.tiposFormulario[this.tipoAtual];
+                const cabecalhos = tipo.colunas.map(c => c.label);
+                let csv = '\uFEFF' + cabecalhos.join(';') + '\n';
+                
+                this.dadosAtuais.forEach(item => {
+                    const linha = tipo.colunas.map(col => this.escaparCSV(item[col.id])).join(';');
+                    csv += linha + '\n';
+                });
+                
+                document.getElementById('textoCSVWizard').value = csv;
+                document.getElementById('containerCSVWizard').classList.remove('oculto');
+                this.mostrarMensagemWizard('Dados prontos para exportação');
+            }
+
+            copiarCSVWizard() {
+                const textarea = document.getElementById('textoCSVWizard');
+                textarea.select();
+                document.execCommand('copy');
+                this.mostrarMensagemWizard('CSV copiado!');
+            }
+
+            baixarCSVWizard() {
+                const csv = document.getElementById('textoCSVWizard').value;
+                const nome = `${this.tipoAtual}_${this.colecaoAtual}_${new Date().toISOString().split('T')[0]}.csv`;
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = nome;
+                link.click();
+                this.mostrarMensagemWizard('Arquivo baixado!');
+            }
+
+            mostrarMensagemWizard(texto, tipo = 'sucesso') {
+                const mensagem = document.getElementById('mensagemWizard');
+                mensagem.textContent = texto;
+                mensagem.className = `mensagem ${tipo} visivel`;
+                setTimeout(() => mensagem.classList.remove('visivel'), 3000);
+            }
+
+            // ===========================================================================
+            // EDIÇÃO DE VÍNCULO (MODAL)
+            // ===========================================================================
+
+            abrirModalEdicao(indice) {
+                if (indice < 0 || indice >= this.dadosAtuais.length) {
+                    this.mostrarMensagemWizard('Item não encontrado', 'erro');
+                    return;
+                }
+                
+                const item = this.dadosAtuais[indice];
+                
+                // Preencher campos do modal
+                document.getElementById('editPredio').value = item.predio || '';
+                document.getElementById('editAndar').value = item.andar || '';
+                document.getElementById('editSetor').value = item.setor || '';
+                document.getElementById('editArea').value = item.area || '';
+                document.getElementById('editImpressora').value = item.impressora || '';
+                document.getElementById('editHostname').value = item.hostname || '';
+                document.getElementById('editIndice').value = indice;
+                
+                // Abrir modal
+                document.getElementById('modalEdicaoVinculo').classList.add('ativo');
+                document.getElementById('editHostname').focus();
+            }
+
+            fecharModalEdicao() {
+                document.getElementById('modalEdicaoVinculo').classList.remove('ativo');
+                document.getElementById('formEdicaoVinculo').reset();
+                document.getElementById('editIndice').value = -1;
+            }
+
+            salvarEdicaoVinculo(evento) {
+                evento.preventDefault();
+                
+                const indice = parseInt(document.getElementById('editIndice').value);
+                if (indice < 0 || indice >= this.dadosAtuais.length) {
+                    this.mostrarMensagemWizard('Erro: índice inválido', 'erro');
+                    return;
+                }
+                
+                const predio = document.getElementById('editPredio').value;
+                const andar = document.getElementById('editAndar').value;
+                const setor = document.getElementById('editSetor').value.trim().toUpperCase();
+                const area = document.getElementById('editArea').value.trim().toUpperCase();
+                const impressora = document.getElementById('editImpressora').value.trim().toUpperCase();
+                const hostname = document.getElementById('editHostname').value.trim().toUpperCase();
+                
+                // Validação
+                if (!predio || !andar || !setor || !area || !impressora || !hostname) {
+                    this.mostrarMensagemWizard('Preencha todos os campos', 'erro');
+                    return;
+                }
+                
+                // Guardar hostname antigo para atualizar lista visual
+                const hostnameAntigo = this.dadosAtuais[indice].hostname;
+                
+                // Atualizar registro
+                this.dadosAtuais[indice] = {
+                    setor,
+                    predio,
+                    andar,
+                    area,
+                    impressora,
+                    hostname
+                };
+                
+                // Salvar
+                this.colecoes[this.tipoAtual][this.colecaoAtual] = this.dadosAtuais;
+                this.salvarDados();
+                
+                // Atualizar histórico com novos valores
+                this.adicionarHistorico('setores', setor);
+                this.adicionarHistorico('areas', area);
+                this.adicionarHistorico('impressoras', impressora);
+                
+                // Atualizar lista de hostnames atuais se o item pertence ao contexto atual
+                if (this.wizardState.localizacao && this.wizardState.ambiente) {
+                    const idxHostnameAtual = this.wizardState.hostnamesAtuais.indexOf(hostnameAntigo);
+                    if (idxHostnameAtual !== -1) {
+                        // Verificar se ainda pertence ao mesmo contexto
+                        const mesmoContexto = 
+                            setor === this.wizardState.localizacao.setor &&
+                            predio === this.wizardState.localizacao.predio &&
+                            andar === this.wizardState.localizacao.andar &&
+                            area === this.wizardState.ambiente.area &&
+                            impressora === this.wizardState.ambiente.impressora;
+                        
+                        if (mesmoContexto) {
+                            // Atualizar hostname na lista
+                            this.wizardState.hostnamesAtuais[idxHostnameAtual] = hostname;
+                        } else {
+                            // Remover da lista atual (mudou de contexto)
+                            this.wizardState.hostnamesAtuais.splice(idxHostnameAtual, 1);
+                        }
+                        this.renderizarListaHostnamesAtuais();
+                    }
+                }
+                
+                // Fechar modal e atualizar UI
+                this.fecharModalEdicao();
+                this.renderizarTabelaWizard();
+                this.renderizarHub();
+                this.mostrarMensagemWizard('Vínculo atualizado com sucesso!');
+            }
+
+            configurarEventosWizard() {
+                // Setor
+                document.getElementById('wizSetor').addEventListener('change', (e) => {
+                    this.tratarSelecaoOutroWizard('wizSetor');
+                });
+                document.getElementById('wizSetorManual').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+                
+                // Área
+                document.getElementById('wizArea').addEventListener('change', (e) => {
+                    this.tratarSelecaoOutroWizard('wizArea');
+                });
+                document.getElementById('wizAreaManual').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+                
+                // Impressora
+                document.getElementById('wizImpressora').addEventListener('change', (e) => {
+                    this.tratarSelecaoOutroWizard('wizImpressora');
+                });
+                document.getElementById('wizImpressoraManual').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+                
+                // Hostname input
+                document.getElementById('wizHostname').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+                document.getElementById('wizHostname').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.adicionarHostname();
+                    }
+                });
+                
+                // Botões
+                document.getElementById('btnFixarLocalizacao').addEventListener('click', () => this.fixarLocalizacao());
+                document.getElementById('btnFixarAmbiente').addEventListener('click', () => this.fixarAmbiente());
+                document.getElementById('btnAdicionarHostname').addEventListener('click', () => this.adicionarHostname());
+                document.getElementById('btnNovoAmbienteWizard').addEventListener('click', () => this.novoAmbiente());
+                document.getElementById('btnNovaLocalizacaoWizard').addEventListener('click', () => this.novaLocalizacao());
+                
+                // Abas
+                document.getElementById('abaFormularioWizard').addEventListener('click', () => this.mostrarAbaWizard('formulario'));
+                document.getElementById('abaTabelaWizard').addEventListener('click', () => this.mostrarAbaWizard('tabela'));
+                
+                // Exportação
+                document.getElementById('btnExportarCSVWizard').addEventListener('click', () => this.exportarColecaoWizard());
+                document.getElementById('btnCopiarCSVWizard').addEventListener('click', () => this.copiarCSVWizard());
+                document.getElementById('btnBaixarCSVWizard').addEventListener('click', () => this.baixarCSVWizard());
+                document.getElementById('btnLimparTodosWizard').addEventListener('click', () => this.limparTodosWizard());
+                
+                // Navegação
+                document.getElementById('btnInicioWizard').addEventListener('click', () => this.irParaHub());
+                document.getElementById('btnTodasColetasWizard').addEventListener('click', () => this.irParaListaColetas());
+                
+                // Modal de Edição
+                document.getElementById('formEdicaoVinculo').addEventListener('submit', (e) => this.salvarEdicaoVinculo(e));
+                
+                // Converter inputs do modal para maiúsculas
+                ['editSetor', 'editArea', 'editImpressora', 'editHostname'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', (e) => {
+                        e.target.value = e.target.value.toUpperCase();
+                    });
+                });
+            }
+
+            tratarSelecaoOutroWizard(campoId) {
+                const select = document.getElementById(campoId);
+                const container = document.getElementById(`${campoId}ManualContainer`);
+                const manual = document.getElementById(`${campoId}Manual`);
+                
+                if (!select || !container) return;
+                
+                if (select.value === 'OUTRO') {
+                    container.classList.add('visivel');
+                    if (manual) manual.focus();
+                } else {
+                    container.classList.remove('visivel');
+                    if (manual) manual.value = '';
+                }
+            }
+
+            // ===========================================================================
+            // EXPORTAÇÃO (FORMULÁRIO PADRÃO)
             // ===========================================================================
             
             exportarColecao(nomeColecao) {
@@ -2218,8 +3463,12 @@
                 
                 const resumo = { total: dados.length, porCampo: {} };
                 
-                // Analisar campos relevantes
-                ['tipo', 'predio', 'setor'].forEach(campoId => {
+                // Campos relevantes para resumo por tipo
+                const camposResumo = tipo.modoWizard 
+                    ? ['setor', 'predio', 'impressora'] 
+                    : ['tipo', 'predio', 'setor'];
+                
+                camposResumo.forEach(campoId => {
                     if (tipo.colunas.some(c => c.id === campoId)) {
                         resumo.porCampo[campoId] = {};
                         dados.forEach(item => {
@@ -2392,7 +3641,6 @@
                 try {
                     for (let key in localStorage) {
                         if (localStorage.hasOwnProperty(key)) {
-                            // Cada caractere em JS = 2 bytes (UTF-16)
                             bytes += (key.length + localStorage.getItem(key).length) * 2;
                         }
                     }
@@ -2414,45 +3662,31 @@
             }
 
             atualizarIndicadorStorage() {
-                const LIMITE_BYTES = 4 * 1024 * 1024; // 4MB seguro
+                const LIMITE_BYTES = 5 * 1024 * 1024;
                 const usoBytes = this.calcularUsoStorage();
                 const percentual = Math.min((usoBytes / LIMITE_BYTES) * 100, 100);
                 
-                // Atualizar elementos
-                const barEl = document.getElementById('storageBar');
-                const percentEl = document.getElementById('storagePercent');
-                const usedEl = document.getElementById('storageUsed');
-                const warningEl = document.getElementById('storageWarning');
+                const container = document.getElementById('storageIndicator');
+                const ringEl = document.getElementById('storageRing');
+                const textEl = document.getElementById('storageText');
+                const percentEl = document.getElementById('storagePercentMini');
                 
-                if (!barEl || !percentEl || !usedEl || !warningEl) return;
+                if (!container || !ringEl || !textEl) return;
                 
-                // Atualizar valores
-                barEl.style.width = percentual + '%';
-                percentEl.textContent = percentual.toFixed(1) + '%';
-                usedEl.textContent = this.formatarBytes(usoBytes);
+                textEl.textContent = `${this.formatarBytes(usoBytes)} de 5 MB`;
                 
-                // Remover classes anteriores
-                barEl.classList.remove('warning', 'danger');
-                warningEl.classList.remove('critical');
-                warningEl.classList.add('oculto');
+                if (percentEl) {
+                    percentEl.textContent = percentual >= 50 ? Math.round(percentual) + '%' : '';
+                }
                 
-                // Aplicar cores baseado no uso
+                const cor = percentual >= 90 ? '#ef4444' : percentual >= 70 ? '#f59e0b' : '#22c55e';
+                ringEl.style.background = `conic-gradient(${cor} ${percentual}%, #e2e8f0 ${percentual}%)`;
+                
+                container.classList.remove('warning', 'danger');
                 if (percentual >= 90) {
-                    barEl.classList.add('danger');
-                    percentEl.style.backgroundColor = '#fee2e2';
-                    percentEl.style.color = '#dc2626';
-                    warningEl.classList.remove('oculto');
-                    warningEl.classList.add('critical');
-                    warningEl.textContent = '🚨 Armazenamento crítico! Exporte e limpe coletas antigas urgentemente.';
+                    container.classList.add('danger');
                 } else if (percentual >= 70) {
-                    barEl.classList.add('warning');
-                    percentEl.style.backgroundColor = '#fef3c7';
-                    percentEl.style.color = '#d97706';
-                    warningEl.classList.remove('oculto');
-                    warningEl.textContent = '⚠️ Armazenamento quase cheio! Considere exportar e limpar coletas antigas.';
-                } else {
-                    percentEl.style.backgroundColor = '#d1fae5';
-                    percentEl.style.color = '#059669';
+                    container.classList.add('warning');
                 }
             }
 
