@@ -2786,12 +2786,19 @@
                 this.atualizarEtapaWizard(1);
                 document.getElementById('contextoLocalizacao').classList.add('oculto');
                 document.getElementById('contextoAmbiente').classList.add('oculto');
+                
+                // Garantir que seção de localização esteja visível e habilitada
+                document.getElementById('secaoLocalizacao').classList.remove('oculto');
                 document.getElementById('secaoLocalizacao').classList.remove('desabilitada');
+                
+                // Seções seguintes ocultas/desabilitadas
+                document.getElementById('secaoAmbiente').classList.add('oculto');
                 document.getElementById('secaoAmbiente').classList.add('desabilitada');
                 document.getElementById('secaoHostnames').classList.add('desabilitada');
+                
                 document.getElementById('btnNovoAmbienteWizard').classList.add('oculto');
                 document.getElementById('btnNovaLocalizacaoWizard').classList.add('oculto');
-                document.getElementById('resumoWizard').classList.add('oculto');
+                document.getElementById('resumoWizard').classList.remove('oculto');
                 
                 // Limpar campos
                 document.getElementById('wizPredio').value = '';
