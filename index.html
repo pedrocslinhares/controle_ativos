@@ -2882,10 +2882,14 @@
                 
                 this.wizardState.localizacao = { predio, andar, setor };
                 
+                // Resetar ambiente ao mudar localização
+                this.wizardState.ambiente = null;
+                this.wizardState.hostnamesAtuais = [];
+                
                 // Atualizar histórico
                 this.adicionarHistorico('setores', setor);
                 
-                // Atualizar UI
+                // Atualizar UI - Mostrar contexto de localização
                 document.getElementById('contextoLocalizacao').classList.remove('oculto');
                 document.getElementById('dadosLocalizacaoFixada').innerHTML = `
                     <span class="contexto-tag"><strong>Prédio:</strong> ${predio}</span>
@@ -2893,8 +2897,35 @@
                     <span class="contexto-tag"><strong>Setor:</strong> ${setor}</span>
                 `;
                 
+                // Esconder contexto de ambiente (será redefinido)
+                document.getElementById('contextoAmbiente').classList.add('oculto');
+                
+                // Esconder seção de localização, mostrar seção de ambiente
                 document.getElementById('secaoLocalizacao').classList.add('oculto');
+                document.getElementById('secaoAmbiente').classList.remove('oculto');
                 document.getElementById('secaoAmbiente').classList.remove('desabilitada');
+                
+                // Manter seção de hostnames desabilitada até definir ambiente
+                document.getElementById('secaoHostnames').classList.add('desabilitada');
+                
+                // Esconder botões de ação até definir ambiente
+                document.getElementById('btnNovoAmbienteWizard').classList.add('oculto');
+                document.getElementById('btnNovaLocalizacaoWizard').classList.add('oculto');
+                
+                // Limpar lista visual de hostnames
+                document.getElementById('listaHostnamesAtual').innerHTML = '';
+                
+                // Limpar campos do ambiente para nova seleção
+                document.getElementById('wizArea').value = '';
+                document.getElementById('wizAreaManual').value = '';
+                document.getElementById('wizAreaManualContainer').classList.remove('visivel');
+                document.getElementById('wizImpressora').value = '';
+                document.getElementById('wizImpressoraManual').value = '';
+                document.getElementById('wizImpressoraManualContainer').classList.remove('visivel');
+                
+                // Atualizar selects de histórico do ambiente
+                this.atualizarSelectHistoricoWizard('wizArea', 'areas');
+                this.atualizarSelectHistoricoWizard('wizImpressora', 'impressoras');
                 
                 this.atualizarEtapaWizard(2);
                 this.mostrarMensagemWizard('Localização definida! Agora defina o ambiente.');
